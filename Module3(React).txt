@@ -1,0 +1,22 @@
+React :-
+1. Introduction
+2. JSX(Java script Extension)
+3. REACT ENVIORMENT SETUP 
+4. REACT PROJECT STRUCTURE
+5. REACT COMPONENTS
+	a. Introduction
+	b. Types of components 
+	c. Arrow function
+	d. Properties
+	e. React states 
+	f. Fragments
+	g. React event Handling 
+	h. React Rendering
+	i. React Routing
+	j. React Hooks
+	k. Material UI
+6. Form Handling React
+7. AXIOs in react
+8. API integer
+9. Redux
+10.Hands on pratice

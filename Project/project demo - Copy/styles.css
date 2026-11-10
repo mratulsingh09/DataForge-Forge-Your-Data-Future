@@ -1,0 +1,253 @@
+    :root {
+      --df-bg-dark: #050505;
+      --df-bg-light: #f3f3f3;
+      --df-card-bg: rgba(17, 17, 18, 0.9);
+      --df-card-bg-light: rgba(255, 255, 255, 0.9);
+      --df-card-border: rgba(255, 255, 255, 0.12);
+      --df-card-border-light: rgba(15, 23, 42, 0.12);
+      --df-cyan: #e5e7eb;
+      --df-cyan-glow: rgba(255, 255, 255, 0.18);
+      --df-indigo: #d4d4d8;
+      --df-indigo-glow: rgba(255, 255, 255, 0.2);
+      --df-purple: #a1a1aa;
+      --df-emerald: #d1d5db;
+      --df-amber: #f5f5f5;
+      --df-rose: #ffffff;
+      --df-text: #f5f5f5;
+      --df-text-soft: #b3b3b3;
+      --df-text-dark: #111827;
+      --df-surface: #0f0f10;
+      --df-surface-alt: #17181b;
+      --df-surface-light: #ffffff;
+      --df-muted-line: rgba(255, 255, 255, 0.08);
+      --df-shadow: rgba(0,0,0,0.45);
+      --df-accent: #ffffff;
+    }
+
+    html[data-bs-theme="light"] {
+      --df-bg-dark: var(--df-bg-light);
+      --df-card-bg: var(--df-card-bg-light);
+      --df-card-border: var(--df-card-border-light);
+      --df-text: var(--df-text-dark);
+      --df-text-soft: #4b5563;
+      --df-surface: #ffffff;
+      --df-surface-alt: #f4f4f5;
+      --df-muted-line: rgba(17, 24, 39, 0.09);
+      --df-shadow: rgba(15, 23, 42, 0.08);
+      --df-accent: #111111;
+    }
+
+    body {
+      background-color: var(--df-bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--df-text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    .df-navbar {
+      background: rgba(11, 11, 11, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--df-muted-line);
+      box-shadow: 0 4px 20px var(--df-shadow);
+    }
+
+    html[data-bs-theme="light"] .df-navbar {
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    .df-brand-icon {
+      background: linear-gradient(135deg, #f8fafc, #d4d4d8);
+      color: #070a12;
+      border-radius: 10px;
+      padding: 8px 12px;
+      box-shadow: 0 0 20px var(--df-cyan-glow);
+    }
+
+    .df-card {
+      background: var(--df-card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--df-card-border);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px var(--df-shadow);
+      transition: all 0.25s ease-in-out;
+    }
+
+    .df-card:hover {
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .df-card-header {
+      border-bottom: 1px solid var(--df-muted-line);
+      padding: 1rem 1.25rem;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    html[data-bs-theme="light"] .df-card-header {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .preset-card {
+      background: rgba(17, 17, 17, 0.75);
+      border: 1px solid var(--df-card-border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    html[data-bs-theme="light"] .preset-card {
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .preset-card:hover {
+      border-color: rgba(255, 255, 255, 0.75);
+      background: rgba(24, 24, 26, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-bs-theme="light"] .preset-card:hover {
+      background: rgba(245, 245, 245, 0.9);
+    }
+
+    .preset-card.active {
+      border-color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.18);
+    }
+
+    html[data-bs-theme="light"] .preset-card.active {
+      background: rgba(17, 17, 17, 0.06);
+      box-shadow: 0 0 20px rgba(17, 17, 17, 0.08);
+    }
+
+    .form-select, .form-control {
+      background-color: var(--df-surface-alt);
+      border-color: var(--df-card-border);
+      color: var(--df-text);
+      font-size: 0.875rem;
+      border-radius: 8px;
+    }
+
+    html[data-bs-theme="light"] .form-select,
+    html[data-bs-theme="light"] .form-control {
+      background-color: #ffffff;
+      color: #111827;
+    }
+
+    .form-select:focus, .form-control:focus {
+      background-color: var(--df-surface);
+      border-color: rgba(255, 255, 255, 0.6);
+      color: var(--df-text);
+      box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.12);
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--df-text-soft);
+    }
+
+    .nav-pills .nav-link {
+      color: var(--df-text-soft);
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .nav-pills .nav-link:hover {
+      color: var(--df-text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-pills .nav-link.active {
+      background: linear-gradient(135deg, #ffffff, #d4d4d8);
+      color: #111111;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.18);
+    }
+
+    html[data-bs-theme="light"] .nav-pills .nav-link.active {
+      background: linear-gradient(135deg, #111111, #4b5563);
+      color: #ffffff;
+    }
+
+    @keyframes spinFan {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fan-spinning {
+      animation: spinFan 0.4s linear infinite;
+      transform-origin: center;
+    }
+
+    .fan-spinning-fast {
+      animation: spinFan 0.15s linear infinite;
+      transform-origin: center;
+    }
+
+    @keyframes pulseLiquid {
+      0%, 100% { opacity: 0.6; stroke: #06b6d4; }
+      50% { opacity: 1; stroke: #38bdf8; filter: drop-shadow(0 0 8px #06b6d4); }
+    }
+
+    .liquid-tube {
+      animation: pulseLiquid 2s infinite ease-in-out;
+    }
+
+    .liquid-tube-hot {
+      animation: pulseLiquid 0.8s infinite ease-in-out;
+      stroke: #f43f5e !important;
+    }
+
+    .btn-cyan {
+      background: var(--df-accent);
+      border: 1px solid var(--df-accent);
+      color: var(--df-bg-dark);
+      font-weight: 700;
+    }
+
+    .btn-cyan:hover {
+      filter: brightness(0.9);
+      color: var(--df-bg-dark);
+    }
+
+    .btn-outline-cyan {
+      border-color: rgba(255, 255, 255, 0.5);
+      color: var(--df-text);
+    }
+
+    html[data-bs-theme="light"] .btn-outline-cyan {
+      border-color: rgba(17, 17, 17, 0.25);
+      color: #111827;
+    }
+
+    .quick-stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--df-card-border);
+      border-radius: 10px;
+      padding: 0.75rem 0.8rem;
+    }
+
+    html[data-bs-theme="light"] .quick-stat-box {
+      background: rgba(17, 17, 17, 0.02);
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printQuoteArea, #printQuoteArea * { visibility: visible; }
+      #printQuoteArea { position: absolute; left: 0; top: 0; width: 100%; color: #000 !important; background: #fff !important; }
+      .no-print { display: none !important; }
+    }

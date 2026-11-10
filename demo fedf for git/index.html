@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Digital | Modern Web Experience</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts (Plus Jakarta Sans) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --brand-primary: #4f46e5;
+            --brand-primary-hover: #4338ca;
+            --brand-secondary: #06b6d4;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            --card-shadow-hover: 0 20px 35px -10px rgba(79, 70, 229, 0.15);
+            --transition-speed: 0.3s;
+        }
+
+        [data-bs-theme="dark"] {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --brand-primary: #6366f1;
+            --brand-primary-hover: #818cf8;
+            --brand-secondary: #22d3ee;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: 0 20px 35px -10px rgba(99, 102, 241, 0.25);
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-speed) ease;
+        }
+
+        [data-bs-theme="dark"] .navbar {
+            background-color: rgba(11, 15, 25, 0.85);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .brand-gradient {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 0 6px;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--brand-primary) !important;
+        }
+
+        .theme-toggle-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+            border-color: var(--brand-primary);
+        }
+
+        .hero-section {
+            padding: 120px 0 80px;
+            background: radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--brand-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(79, 70, 229, 0.15);
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 24px;
+        }
+
+        .btn-brand {
+            background-color: var(--brand-primary);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-brand:hover {
+            background-color: var(--brand-primary-hover);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-outline-custom {
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            transform: translateY(-2px);
+        }
+
+        .hero-illustration {
+            position: relative;
+        }
+
+        .hero-card-preview {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--card-shadow-hover);
+            transition: transform 0.3s ease;
+        }
+
+        .section-padding {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 50px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            text-center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-number {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 32px;
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+
+        .service-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.1));
+            color: var(--brand-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover .service-icon {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 10px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .avatar-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--brand-primary);
+        }
+
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-control, .form-select {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 80px 0 30px;
+        }
+
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .footer-link:hover {
+            color: var(--brand-primary);
+            transform: translateX(4px);
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .social-btn:hover {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            transform: translateY(-3px);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--brand-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            color: white;
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="100">
+
+    <nav class="navbar navbar-expand-lg sticky-top" id="navbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <span class="fs-3"><i class="bi bi-cpu-fill brand-gradient"></i></span>
+                <span>Apex<span class="brand-gradient">Digital</span></span>
+            </a>
+            
+            <div class="d-flex align-items-center gap-2 order-lg-3">
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+                    <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                </button>
+                <button class="navbar-toggler border-0 shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse order-lg-2" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 text-center text-lg-start">
+                    <div class="hero-badge">
+                        <i class="bi bi-stars"></i> Next-Gen Digital Solutions
+                    </div>
+                    <h1 class="hero-title">
+                        Empowering Growth Through <span class="brand-gradient">Innovation</span>
+                    </h1>
+                    <p class="lead text-muted mb-4 fs-5">
+                        We design and develop high-performance web applications, intelligent automation systems, and enterprise-grade software built to scale.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                        <a href="#contact" class="btn btn-brand">
+                            Get Started <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                        <a href="#services" class="btn btn-outline-custom">
+                            Explore Services
+                        </a>
+                    </div>
+                    <div class="mt-5 d-flex align-items-center justify-content-center justify-content-lg-start gap-4 text-muted">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <span class="small fw-semibold">99.9% Uptime</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <span class="small fw-semibold">24/7 Monitoring</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 hero-illustration">
+                    <div class="hero-card-preview p-4 position-relative">
+                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-primary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-activity"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Live System Metrics</h6>
+                                    <small class="text-muted">Real-time Performance</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">Optimal</span>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-body-tertiary">
+                                    <small class="text-muted d-block mb-1">API Requests</small>
+                                    <span class="fs-4 fw-bold">1.4M / hr</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-body-tertiary">
+                                    <small class="text-muted d-block mb-1">Avg Response</small>
+                                    <span class="fs-4 fw-bold text-success">18ms</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-3 bg-body-tertiary d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-check text-primary fs-4"></i>
+                                <div>
+                                    <div class="fw-semibold small">End-to-End Encrypted</div>
+                                    <small class="text-muted" style="font-size: 0.75rem;">SOC2 Type II Certified</small>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section-padding bg-body-tertiary">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="text-primary fw-bold text-uppercase tracking-wider small">About Apex Digital</span>
+                    <h2 class="section-title mt-2">Transforming visions into robust digital reality.</h2>
+                    <p class="text-muted lead mb-4">
+                        Founded in 2020, we are a team of architects, engineers, and product strategists dedicated to delivering digital products that make a measurable impact.
+                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="p-2 rounded bg-primary-subtle text-primary mt-1">
+                                    <i class="bi bi-lightning-charge-fill"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Agile Velocity</h6>
+                                    <small class="text-muted">Rapid iteration cycles ensuring fast time to market.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="p-2 rounded bg-primary-subtle text-primary mt-1">
+                                    <i class="bi bi-code-slash"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Clean Architecture</h6>
+                                    <small class="text-muted">Scalable codebase built with modern best practices.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="row g-3" id="statsContainer">
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-number" data-target="250">0</div>
+                                <div class="fw-semibold text-muted">Projects Delivered</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-number" data-target="99">0</div>
+                                <div class="fw-semibold text-muted">% Satisfaction</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-number" data-target="45">0</div>
+                                <div class="fw-semibold text-muted">Global Experts</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-number" data-target="12">0</div>
+                                <div class="fw-semibold text-muted">Industry Awards</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="section-padding">
+        <div class="container">
+            <div class="text-center">
+                <span class="text-primary fw-bold text-uppercase tracking-wider small">Capabilities</span>
+                <h2 class="section-title mt-2">Solutions Built For Modern Teams</h2>
+                <p class="section-subtitle">Discover our comprehensive suite of engineering and strategy services tailored for scale.</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <div class="col">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-cloud-check-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Cloud Infrastructure</h5>
+                        <p class="text-muted mb-4">Designing resilient serverless architectures, AWS/GCP deployments, and automated CI/CD pipelines.</p>
+                        <a href="#contact" class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-2">
+                            Learn More <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-phone-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Mobile & Web Apps</h5>
+                        <p class="text-muted mb-4">Crafting ultra-responsive React, Angular, and cross-platform native mobile applications.</p>
+                        <a href="#contact" class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-2">
+                            Learn More <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Cybersecurity Strategy</h5>
+                        <p class="text-muted mb-4">Penetration testing, vulnerability assessments, and robust zero-trust security architecture.</p>
+                        <a href="#contact" class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-2">
+                            Learn More <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-cpu-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">AI & Automation</h5>
+                        <p class="text-muted mb-4">Integrating custom LLMs, automated workflows, and machine learning models directly into your operations.</p>
+                        <a href="#contact" class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-2">
+                            Learn More <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-palette-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">UI/UX Product Design</h5>
+                        <p class="text-muted mb-4">Human-centric design systems, interactive prototypes, and accessible user research insights.</p>
+                        <a href="#contact" class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-2">
+                            Learn More <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Data Engineering</h5>
+                        <p class="text-muted mb-4">Building high-throughput data pipelines, real-time analytics dashboards, and warehouse integrations.</p>
+                        <a href="#contact" class="text-primary fw-bold text-decoration-none d-inline-flex align-items-center gap-2">
+                            Learn More <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="section-padding bg-body-tertiary">
+        <div class="container">
+            <div class="text-center">
+                <span class="text-primary fw-bold text-uppercase tracking-wider small">Testimonials</span>
+                <h2 class="section-title mt-2">Trusted By Industry Leaders</h2>
+                <p class="section-subtitle">Here is what founders and executives say about working with Apex Digital.</p>
+            </div>
+
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <div class="testimonial-card text-center">
+                                    <div class="text-warning mb-3">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <p class="fs-5 italic mb-4">
+                                        "Apex Digital overhauled our entire backend infrastructure in under 90 days. Our API response times dropped by 65%, and our team couldn't be happier with the process."
+                                    </p>
+                                    <img src="https://placehold.co/100x100/4f46e5/ffffff?text=SJ" alt="Sarah Jenkins" class="avatar-img mb-3 mx-auto">
+                                    <h6 class="fw-bold mb-0">Sarah Jenkins</h6>
+                                    <small class="text-muted">CTO at FinScale Inc.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <div class="testimonial-card text-center">
+                                    <div class="text-warning mb-3">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <p class="fs-5 italic mb-4">
+                                        "The level of precision and UI polish delivered by Apex was astounding. They felt like an internal team working seamlessly alongside our product managers."
+                                    </p>
+                                    <img src="https://placehold.co/100x100/06b6d4/ffffff?text=MR" alt="Marcus Chen" class="avatar-img mb-3 mx-auto">
+                                    <h6 class="fw-bold mb-0">Marcus Rivera</h6>
+                                    <small class="text-muted">Head of Product at Nexus Software</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <button class="btn btn-outline-custom rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev" aria-label="Previous">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                    <button class="btn btn-outline-custom rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next" aria-label="Next">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section-padding">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-5">
+                    <span class="text-primary fw-bold text-uppercase tracking-wider small">Let's Connect</span>
+                    <h2 class="section-title mt-2">Ready to scale your next big project?</h2>
+                    <p class="text-muted mb-4">
+                        Send us a message and our technical team will respond within 24 business hours with an initial consultation plan.
+                    </p>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="p-3 rounded-circle bg-primary-subtle text-primary fs-5">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Email Us</div>
+                            <div class="fw-bold">hello@apexdigital.example</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="p-3 rounded-circle bg-primary-subtle text-primary fs-5">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Headquarters</div>
+                            <div class="fw-bold">100 Tech Plaza, San Francisco, CA</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-3 rounded-circle bg-primary-subtle text-primary fs-5">
+                            <i class="bi bi-telephone-fill"></i>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Call Directly</div>
+                            <div class="fw-bold">+1 (800) 555-0199</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="contact-card">
+                        <form id="contactForm" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="fullName" class="form-label fw-semibold">Full Name *</label>
+                                    <input type="text" class="form-control" id="fullName" placeholder="Jane Doe" required>
+                                    <div class="invalid-feedback">Please enter your full name.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="emailAddress" class="form-label fw-semibold">Email Address *</label>
+                                    <input type="email" class="form-control" id="emailAddress" placeholder="jane@company.com" required>
+                                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="serviceSelect" class="form-label fw-semibold">Service Needed</label>
+                                    <select class="form-select" id="serviceSelect" required>
+                                        <option value="" selected disabled>Select a service...</option>
+                                        <option value="cloud">Cloud Infrastructure</option>
+                                        <option value="app">Mobile & Web Apps</option>
+                                        <option value="security">Cybersecurity</option>
+                                        <option value="ai">AI & Automation</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a service option.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="budgetSelect" class="form-label fw-semibold">Project Budget</label>
+                                    <select class="form-select" id="budgetSelect">
+                                        <option value="10-25k">$10k - $25k</option>
+                                        <option value="25-50k">$25k - $50k</option>
+                                        <option value="50k+">$50k+</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label fw-semibold">Project Details *</label>
+                                    <textarea class="form-control" id="message" rows="4" placeholder="Tell us about your goals, scope, and target timeline..." required></textarea>
+                                    <div class="invalid-feedback">Please provide brief project details.</div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" id="submitBtn" class="btn btn-brand w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                                        <span>Send Message</span>
+                                        <i class="bi bi-send-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-md-6">
+                    <a class="navbar-brand d-flex align-items-center gap-2 mb-3" href="#">
+                        <span class="fs-3"><i class="bi bi-cpu-fill brand-gradient"></i></span>
+                        <span class="fs-4">Apex<span class="brand-gradient">Digital</span></span>
+                    </a>
+                    <p class="text-muted pe-lg-4">
+                        Engineering modern digital experiences with speed, security, and scalability.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="social-btn" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-btn" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-btn" aria-label="GitHub"><i class="bi bi-github"></i></a>
+                        <a href="#" class="social-btn" aria-label="Discord"><i class="bi bi-discord"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3">Navigation</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="footer-link">Home</a></li>
+                        <li><a href="#about" class="footer-link">About Us</a></li>
+                        <li><a href="#services" class="footer-link">Services</a></li>
+                        <li><a href="#testimonials" class="footer-link">Testimonials</a></li>
+                        <li><a href="#contact" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3">Services</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#services" class="footer-link">Cloud DevOps</a></li>
+                        <li><a href="#services" class="footer-link">App Dev</a></li>
+                        <li><a href="#services" class="footer-link">AI & ML</a></li>
+                        <li><a href="#services" class="footer-link">UI/UX Design</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="fw-bold mb-3">Subscribe to Newsletter</h6>
+                    <p class="text-muted small">Stay updated with the latest in tech, engineering insights, and tech trends.</p>
+                    <form id="newsletterForm" class="d-flex gap-2">
+                        <input type="email" class="form-control" placeholder="Enter your email" required id="newsletterEmail">
+                        <button type="submit" class="btn btn-brand px-3">Join</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-top pt-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 text-muted small">
+                <div>&copy; 2026 Apex Digital Solutions Inc. All rights reserved.</div>
+                <div class="d-flex gap-4">
+                    <a href="#" class="text-muted text-decoration-none">Privacy Policy</a>
+                    <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <a href="#" class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 2000;">
+        <div id="liveToast" class="toast align-items-center text-white bg-primary border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2" id="toastMessage">
+                    <i class="bi bi-check-circle-fill fs-5"></i> Message sent successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const htmlElement = document.documentElement;
+
+            // Load saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+            });
+
+            function setTheme(theme) {
+                htmlElement.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('theme', theme);
+                if (theme === 'dark') {
+                    themeIcon.className = 'bi bi-sun-fill';
+                } else {
+                    themeIcon.className = 'bi bi-moon-stars-fill';
+                }
+            }
+
+            const statNumbers = document.querySelectorAll('.stat-number');
+            let animated = false;
+
+            const animateStats = () => {
+                statNumbers.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    const duration = 1500; // ms
+                    const increment = target / (duration / 16);
+
+                    let current = 0;
+                    const updateCount = () => {
+                        current += increment;
+                        if (current < target) {
+                            counter.innerText = Math.ceil(current);
+                            requestAnimationFrame(updateCount);
+                        } else {
+                            counter.innerText = target + '+';
+                        }
+                    };
+                    updateCount();
+                });
+            };
+
+            // Trigger stat counters on scroll into view
+            const statsSection = document.getElementById('statsContainer');
+            if (statsSection) {
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting && !animated) {
+                        animateStats();
+                        animated = true;
+                    }
+                }, { threshold: 0.3 });
+                observer.observe(statsSection);
+            }
+
+            const contactForm = document.getElementById('contactForm');
+            const toastElement = document.getElementById('liveToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const bsToast = new bootstrap.Toast(toastElement, { delay: 4000 });
+
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!contactForm.checkValidity()) {
+                    contactForm.classList.add('was-validated');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitBtn');
+                const originalBtnText = submitBtn.innerHTML;
+
+                // Set loading spinner state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...`;
+
+                // Simulate API call
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    contactForm.reset();
+                    contactForm.classList.remove('was-validated');
+
+                    // Show custom toast message
+                    toastMessage.innerHTML = `<i class="bi bi-check-circle-fill fs-5"></i> Thank you! Your message has been received.`;
+                    bsToast.show();
+                }, 1500);
+            });
+
+            // Newsletter subscription
+            const newsletterForm = document.getElementById('newsletterForm');
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = document.getElementById('newsletterEmail');
+                if (emailInput.value.trim() !== '') {
+                    toastMessage.innerHTML = `<i class="bi bi-envelope-check-fill fs-5"></i> Subscribed successfully!`;
+                    bsToast.show();
+                    emailInput.value = '';
+                }
+            });
+
+            const backToTopBtn = document.getElementById('backToTop');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

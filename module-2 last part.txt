@@ -1,0 +1,56 @@
+9. undo changes in Git:- 
+ 	There are three stages :- 	
+			a. Unstaged areas (Untracked area)
+					Student management 
+			student.java
+			- make some changes 	
+			 Undo it 
+			-command
+	
+git add . :-
+	Step 2:- staged  area(tracked)
+			student-Management
+			student.java
+			- make some changes
+		undo it 
+		- command 
+	git commit -m "message"
+
+Step 3 :- 
+	Rem Rep Area (Tracked)
+				Student - management
+		student.java
+		- make some changes 
+		undo it 
+		- command 
+	commands:
+	Step 1:-   
+	you modified a file (Student.java) but sdidn't  run git add . (unstaged area)
+ 	undo changes :-
+		git restore student.java
+
+Step -2 :- 
+	you modified a file (Student.java)  and you ran git add .
+	 undo changes :- =
+		git restores  -- staged student.java
+
+Step3 :- 
+	you modified a file (Student.java) and you ran git add . , git commit -m "message"
+
+	undo changes :- 
+			git revert  "commit -id"
+
+Git tools :- 
+		some of the very popular git tools are:-
+		a. GitHub (Recommend)
+		b. GitBash 
+		c. GitLab
+		d. BitBucket
+		e. Gitea
+
+
+Assigment no 1:- 
+		a. Self learnig on Git Tools (Prepare lecture notes)
+		b. Create  a project (Front -End - Design)
+			i Run a project
+			ii Git History

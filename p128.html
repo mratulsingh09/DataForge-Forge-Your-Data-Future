@@ -1,0 +1,21 @@
+<head>
+<script>
+function validation() {
+    let res = document.myForm.email.value;
+
+    if (res.length < 5)
+        alert("Email must be minimum of 5 characters");
+    else
+        alert("Valid email");
+}
+</script>
+</head>
+
+<body>
+
+<form name="myForm" onsubmit="validation()">
+    Email: <input type="text" name="email">
+    <input type="submit" value="Click Here">
+</form>
+
+</body>

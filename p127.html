@@ -1,0 +1,21 @@
+<head>
+<script>
+function validation() {
+    let res = document.myForm.pwd.value;
+
+    if (res.length < 5)
+        alert("Password must be minimum of 5 characters");
+    else
+        alert("Valid password");
+}
+</script>
+</head>
+
+<body>
+
+<form name="myForm" onsubmit="validation()">
+    Name: <input type="password" name="pwd">
+    <input type="submit" value="Click Here">
+</form>
+
+</body>
