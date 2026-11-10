@@ -5,76 +5,216 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DataForge — Forge Your Data Future</title>
 
+  <!-- ── FAVICONS ── -->
+  <!-- SVG favicon (supports both light and dark browser themes) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23737373'/%3E%3Crect x='5' y='18' width='5' height='9' rx='1.5' fill='%23eae8e1'/%3E%3Crect x='13.5' y='12' width='5' height='15' rx='1.5' fill='%23eae8e1'/%3E%3Crect x='22' y='6' width='5' height='21' rx='1.5' fill='%23eae8e1'/%3E%3C/svg%3E"/>
+  <!-- 32x32 PNG fallback (inline SVG data URI as 32x32) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23737373'/%3E%3Crect x='5' y='18' width='5' height='9' rx='1.5' fill='%23eae8e1'/%3E%3Crect x='13.5' y='12' width='5' height='15' rx='1.5' fill='%23eae8e1'/%3E%3Crect x='22' y='6' width='5' height='21' rx='1.5' fill='%23eae8e1'/%3E%3C/svg%3E"/>
+  <!-- 16x16 PNG fallback -->
+  <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23737373'/%3E%3Crect x='2' y='9' width='3' height='5' rx='0.8' fill='%23eae8e1'/%3E%3Crect x='6.5' y='6' width='3' height='8' rx='0.8' fill='%23eae8e1'/%3E%3Crect x='11' y='3' width='3' height='11' rx='0.8' fill='%23eae8e1'/%3E%3C/svg%3E"/>
+  <!-- Apple touch icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23737373'/%3E%3Crect x='28' y='100' width='32' height='52' rx='8' fill='%23eae8e1'/%3E%3Crect x='74' y='68' width='32' height='84' rx='8' fill='%23eae8e1'/%3E%3Crect x='120' y='32' width='32' height='120' rx='8' fill='%23eae8e1'/%3E%3C/svg%3E"/>
+  <!-- Theme color for browser chrome -->
+  <meta name="theme-color" content="#eae8e1" media="(prefers-color-scheme: light)"/>
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)"/>
+
+  <!-- ── ANTI-FOUC: Set theme & accent color before paint ── -->
+  <script>
+    (function() {
+      var saved = localStorage.getItem('df-theme');
+      var preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      var theme = saved || preferred;
+      document.documentElement.setAttribute('data-theme', theme);
+
+      var savedColor = localStorage.getItem('df-accent-color') || '#06b6d4';
+      if (savedColor && savedColor.startsWith('#')) {
+        var clean = savedColor.replace('#', '');
+        if (clean.length === 3) clean = clean.split('').map(function(c){return c+c;}).join('');
+        var num = parseInt(clean, 16);
+        var r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+        var root = document.documentElement;
+        root.style.setProperty('--primary', savedColor);
+        root.style.setProperty('--primary-rgb', r + ', ' + g + ', ' + b);
+        root.style.setProperty('--primary-glow', 'rgba(' + r + ',' + g + ',' + b + ', 0.12)');
+        root.style.setProperty('--primary-glow-med', 'rgba(' + r + ',' + g + ',' + b + ', 0.25)');
+        root.style.setProperty('--primary-glow-strong', 'rgba(' + r + ',' + g + ',' + b + ', 0.45)');
+        root.style.setProperty('--accent', savedColor);
+        root.style.setProperty('--accent-rgb', r + ', ' + g + ', ' + b);
+        root.style.setProperty('--gold', savedColor);
+      }
+    })();
+  </script>
+
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <!-- Font Awesome 6 -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <!-- Google Fonts -->
+  <!-- Google Fonts — preconnect for speed, then load with font-display:swap -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap"/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Sci-Fi Custom Cursor & Theme Studio Styles -->
+  <link rel="stylesheet" href="cursor.css"/>
+  <link rel="stylesheet" href="theme-changer.css"/>
 
   <style>
     /* ═══════════════════════════════════════════
-       ROOT VARIABLES
+       ROOT VARIABLES — LIGHT THEME (default)
     ═══════════════════════════════════════════ */
     :root {
-      --black:   #eae8e1;
-      --black-2: #f2f0e9;
-      --black-3: #e2dfd7;
-      --black-4: #d5d2ca;
-      --black-5: #c8c5bd;
-      --gold:        #737373;
-      --gold-light:  #8a8a8a;
-      --gold-dim:    #5e5e5e;
-      --gold-darker: #444444;
-      --gold-glow:        rgba(115,115,115,0.1);
-      --gold-glow-med:    rgba(115,115,115,0.18);
-      --gold-glow-strong: rgba(115,115,115,0.28);
-      --white:      #2b2b2b;
-      --gray:       #626262;
-      --gray-light: #454545;
-      --gray-mid:   #aaa69e;
+      /* Theme Studio Dynamic Primary & Accent Variables */
+      --primary:         #06b6d4;
+      --primary-rgb:     6, 182, 212;
+      --primary-light:   #38bdf8;
+      --primary-dim:     #0891b2;
+      --primary-darker:  #0e7490;
+      --primary-glow:    rgba(var(--primary-rgb), 0.12);
+      --primary-glow-med: rgba(var(--primary-rgb), 0.25);
+      --primary-glow-strong: rgba(var(--primary-rgb), 0.45);
+      --accent:          var(--primary);
+      --accent-rgb:      var(--primary-rgb);
+      --accent-light:    var(--primary-light);
+      --accent-dim:      var(--primary-dim);
+      --accent-glow:     var(--primary-glow);
+
+      /* Semantic color tokens — light (beige/cream) */
+      --bg-page:         #eae8e1;
+      --bg-surface:      #f2f0e9;
+      --bg-surface-2:    #e2dfd7;
+      --bg-surface-3:    #d5d2ca;
+      --bg-surface-4:    #c8c5bd;
+      --text-primary:    #2b2b2b;
+      --text-secondary:  #626262;
+      --text-muted:      #454545;
+      --text-mid:        #aaa69e;
+      --border-subtle:   rgba(0,0,0,0.08);
+      --border-card:     rgba(0,0,0,0.10);
+      --grid-line:       rgba(82,82,82,0.12);
+      --shadow-card:     rgba(43,43,43,0.14);
+      --cursor-ring-col: var(--primary);
+      --nav-bg:          rgba(234,232,225,0.9);
+      --nav-bg-scrolled: rgba(234,232,225,0.96);
+      --hero-text:       #111111;
+      --badge-bg:        rgba(0,0,0,0.045);
+      --badge-border:    rgba(0,0,0,0.14);
+      --badge-text:      #333333;
+      --hero-sub-color:  #555555;
+      --flip-card-front: #e2dfd7;
+      --flip-card-bg-1:  #c8c5bd;
+      --offcanvas-bg:    #e2dfd7;
+      --logo-label-col:  #111111;
+      --stats-bg:        #d1d1d1;
+      /* Dynamic Accent Mapping (Legacy & Modern) */
+      --gold:            var(--primary);
+      --gold-light:      var(--primary-light);
+      --gold-dim:        var(--primary-dim);
+      --gold-darker:     var(--primary-darker);
+      --gold-glow:       var(--primary-glow);
+      --gold-glow-med:   var(--primary-glow-med);
+      --gold-glow-strong: var(--primary-glow-strong);
+      /* Aliases kept for backward compat with existing rules */
+      --black:   var(--bg-page);
+      --black-2: var(--bg-surface);
+      --black-3: var(--bg-surface-2);
+      --black-4: var(--bg-surface-3);
+      --black-5: var(--bg-surface-4);
+      --white:   var(--text-primary);
+      --gray:    var(--text-secondary);
+      --gray-light: var(--text-muted);
+      --gray-mid:   var(--text-mid);
       --radius: 14px;
       --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+      --theme-transition: 0.3s ease;
+    }
+
+    /* ═══════════════════════════════════════════
+       DARK THEME OVERRIDES
+    ═══════════════════════════════════════════ */
+    [data-theme="dark"] {
+      --bg-page:         #1a1a1a;
+      --bg-surface:      #212121;
+      --bg-surface-2:    #2a2a2a;
+      --bg-surface-3:    #333333;
+      --bg-surface-4:    #3d3d3d;
+      --text-primary:    #e8e6df;
+      --text-secondary:  #9a9690;
+      --text-muted:      #b8b4ae;
+      --text-mid:        #6a6660;
+      --border-subtle:   rgba(255,255,255,0.07);
+      --border-card:     rgba(255,255,255,0.09);
+      --grid-line:       rgba(200,200,200,0.06);
+      --shadow-card:     rgba(0,0,0,0.5);
+      --cursor-ring-col: var(--primary);
+      --nav-bg:          rgba(26,26,26,0.92);
+      --nav-bg-scrolled: rgba(26,26,26,0.98);
+      --hero-text:       #f0ede6;
+      --badge-bg:        rgba(255,255,255,0.05);
+      --badge-border:    rgba(255,255,255,0.12);
+      --badge-text:      #c8c4bc;
+      --hero-sub-color:  #9a9690;
+      --flip-card-front: #2a2a2a;
+      --flip-card-bg-1:  #222222;
+      --offcanvas-bg:    #242424;
+      --logo-label-col:  #f0ede6;
+      --stats-bg:        #252525;
+      /* Alias overrides */
+      --black:   var(--bg-page);
+      --black-2: var(--bg-surface);
+      --black-3: var(--bg-surface-2);
+      --black-4: var(--bg-surface-3);
+      --black-5: var(--bg-surface-4);
+      --white:   var(--text-primary);
+      --gray:    var(--text-secondary);
+      --gray-light: var(--text-muted);
+      --gray-mid:   var(--text-mid);
     }
 
     /* ═══════════════════════════════════════════
        RESET & BASE
     ═══════════════════════════════════════════ */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior: smooth; font-size: 16px; }
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      /* Smooth font rendering sitewide */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
     body {
-      background: #eae8e1;
-      color: var(--white);
+      background: var(--bg-page);
+      color: var(--text-primary);
       font-family: 'Manrope', sans-serif;
       overflow-x: hidden;
       cursor: none;
+      /* Smooth theme transitions */
+      transition:
+        background-color var(--theme-transition),
+        color var(--theme-transition),
+        border-color var(--theme-transition);
+    }
+    /* Apply theme transition to common elements */
+    *, *::before, *::after {
+      transition:
+        background-color var(--theme-transition),
+        border-color var(--theme-transition);
+    }
+    /* But keep animation/transform transitions unaffected */
+    .flip-card-inner, .hex-tile, .btn-forge, .btn-ghost,
+    .nav-btn-cta, .logo-box, .flip-link, .social-ico,
+    .plan-btn-gold, .plan-btn-outline, .marq-chip,
+    .reveal, .reveal-left, .reveal-right {
+      transition: none;
+    }
+    .flip-card-inner {
+      transition: transform 0.7s cubic-bezier(0.4,0.2,0.2,1) !important;
     }
     body.loaded #loader { opacity:0; pointer-events:none; }
     ::-webkit-scrollbar { width:5px; }
-    ::-webkit-scrollbar-track { background: var(--black-2); }
+    ::-webkit-scrollbar-track { background: var(--bg-surface); }
     ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius:10px; }
-
-    /* ═══════════════════════════════════════════
-       CUSTOM CURSOR
-    ═══════════════════════════════════════════ */
-    #cursor-dot {
-      position:fixed; width:8px; height:8px;
-      background: var(--gold); border-radius:50%;
-      pointer-events:none; z-index:9999;
-      opacity:0; will-change:transform;
-      transition:opacity 0.15s ease;
-    }
-    #cursor-ring {
-      position:fixed; width:36px; height:36px;
-      border:1.5px solid var(--gold);
-      border-radius:50%; pointer-events:none; z-index:9998;
-      opacity:0; will-change:transform,width,height;
-      transition:width 0.2s ease,height 0.2s ease,border-color 0.2s ease,opacity 0.15s ease;
-    }
-    @media (pointer:coarse) {
-      body { cursor:auto; }
-      #cursor-dot, #cursor-ring { display:none; }
-    }
 
     /* ═══════════════════════════════════════════
        PAGE LOADER
@@ -123,16 +263,16 @@
        NAVBAR — Bootstrap + Glassmorphism
     ═══════════════════════════════════════════ */
     #mainNav {
-      background: rgba(234,232,225,0.9);
+      background: var(--nav-bg);
       backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      transition: all 0.4s ease;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, padding 0.4s ease;
       padding: 18px 0;
     }
     #mainNav.scrolled {
-      background: rgba(234,232,225,0.96) !important;
+      background: var(--nav-bg-scrolled) !important;
       backdrop-filter: blur(24px);
-      border-bottom: 1px solid rgba(0,0,0,0.1);
+      border-bottom: 1px solid var(--border-card) !important;
       padding: 10px 0;
       box-shadow: 0 8px 40px rgba(0,0,0,0.12);
     }
@@ -144,7 +284,7 @@
       display:flex; align-items:center; justify-content:center;
       font-size:18px; font-weight:900; color:#2b2b2b;
       box-shadow: 0 0 22px rgba(115,115,115,0.45);
-      transition: transform var(--transition), box-shadow var(--transition);
+      transition: transform var(--transition), box-shadow var(--transition) !important;
     }
     .nav-logo-wrap:hover .logo-box {
       transform: rotate(360deg) scale(1.1);
@@ -152,7 +292,7 @@
     }
     .logo-label {
       font-family:'Space Grotesk',sans-serif;
-      font-size:22px; font-weight:700; color:#111111;
+      font-size:22px; font-weight:700; color: var(--logo-label-col);
       letter-spacing:-0.5px;
     }
     .logo-label span { color:var(--gold); }
@@ -166,10 +306,10 @@
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23a3a3a3' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
     .nav-link-custom {
-      color: #444444 !important;
+      color: var(--text-secondary) !important;
       font-size:14px; font-weight:500;
       letter-spacing:0.3px; padding:6px 14px !important;
-      position:relative; transition:color var(--transition);
+      position:relative; transition:color var(--transition) !important;
     }
     .nav-link-custom::after {
       content:''; position:absolute;
@@ -199,8 +339,25 @@
       transform: translateY(-2px) !important;
       color: #2b2b2b !important;
     }
+    /* ── Theme Toggle Button ── */
+    #themeToggle {
+      width:38px; height:38px;
+      background: var(--gold-glow);
+      border: 1px solid rgba(115,115,115,0.25);
+      border-radius:9px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color: var(--gold);
+      font-size:16px;
+      transition: background var(--transition), box-shadow var(--transition), transform var(--transition) !important;
+      flex-shrink:0;
+    }
+    #themeToggle:hover {
+      background: var(--gold-glow-med);
+      box-shadow: 0 0 18px rgba(115,115,115,0.35);
+      transform: rotate(20deg);
+    }
     /* Offcanvas mobile nav */
-    .offcanvas { background: var(--black-3) !important; border-left:1px solid rgba(115,115,115,0.12) !important; }
+    .offcanvas { background: var(--offcanvas-bg) !important; border-left:1px solid rgba(115,115,115,0.12) !important; }
     .offcanvas-header { border-bottom:1px solid rgba(115,115,115,0.1); }
     .btn-close { filter:none; opacity:0.65; }
 
@@ -209,11 +366,12 @@
     ═══════════════════════════════════════════ */
     #hero {
       position:relative; z-index:1;
-      color:#111111;
+      color: var(--hero-text);
       min-height:100vh;
       display:flex; align-items:center; justify-content:center;
       padding:132px 32px 76px;
       overflow:hidden;
+      background-color: var(--bg-page);
     }
     .hero-layout {
       position:relative; z-index:1;
@@ -252,12 +410,12 @@
     }
     .hero-badge {
       display:inline-flex; align-items:center; gap:8px;
-      background:rgba(0,0,0,0.045);
-      border:1px solid rgba(0,0,0,0.14);
-      color:#333333; padding:8px 20px;
+      background: var(--badge-bg);
+      border:1px solid var(--badge-border);
+      color: var(--badge-text); padding:8px 20px;
       border-radius:50px; font-size:13px; font-weight:600;
       letter-spacing:0.5px; margin-bottom:28px;
-      opacity:0; /* GSAP will animate */
+      opacity:0; /* animated in JS */
     }
     .badge-dot {
       width:8px; height:8px; background:var(--gold);
@@ -267,23 +425,42 @@
       0%,100% { opacity:1; transform:scale(1); }
       50%      { opacity:0.4; transform:scale(0.7); }
     }
+    /* ── Hero heading with reserved typing space ── */
     .hero-heading {
       font-family:'Space Grotesk',sans-serif;
-      font-size:78px;
-      font-weight:800; line-height:1.03;
-      letter-spacing:0; max-width:680px;
+      font-size: clamp(44px, 7vw, 78px);
+      font-weight:800;
+      line-height:1.08;
+      letter-spacing:-0.5px;
+      max-width:680px;
       opacity:0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
     .hero-heading .line1 { display:block; }
+    /* Reserve height so the page doesn't jump while typing */
     .hero-heading .typed-wrap {
-      display:inline-block;
-      background: linear-gradient(135deg, #111111, #666666);
+      display:block;
+      min-height: 1.1em; /* reserves one line of heading height */
+      background: linear-gradient(135deg, var(--hero-text), #666666);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
       background-clip:text;
     }
+    /* Smooth opacity-fade cursor blink instead of abrupt on/off */
+    .typed-cursor {
+      opacity: 1;
+      -webkit-text-fill-color: var(--gold) !important;
+      color: var(--gold) !important;
+      animation: typedBlink 1s ease-in-out infinite !important;
+    }
+    @keyframes typedBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.1; }
+    }
     .hero-sub {
       font-size:18px;
-      color:#555555; max-width:580px;
+      color: var(--hero-sub-color); max-width:580px;
       line-height:1.8; margin-top:26px;
       opacity:0;
     }
@@ -296,14 +473,14 @@
       border-radius:10px; font-size:16px; font-weight:700;
       text-decoration:none;
       box-shadow:0 0 40px rgba(115,115,115,0.3);
-      transition:all var(--transition);
+      transition:all var(--transition) !important;
       position:relative; overflow:hidden;
     }
     .btn-forge::before {
       content:''; position:absolute; inset:0;
       background: linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.25),transparent 70%);
       transform:translateX(-100%);
-      transition:transform 0.5s ease;
+      transition:transform 0.5s ease !important;
     }
     .btn-forge:hover::before { transform:translateX(100%); }
     .btn-forge:hover {
@@ -313,17 +490,17 @@
     }
     .btn-ghost {
       display:inline-flex; align-items:center; gap:10px;
-      background:transparent; color:#171717;
+      background:transparent; color: var(--text-primary);
       padding:16px 38px; border-radius:10px;
       font-size:16px; font-weight:600;
       text-decoration:none;
-      border:1px solid rgba(0,0,0,0.24);
-      transition:all var(--transition);
+      border:1px solid var(--border-card);
+      transition:all var(--transition) !important;
     }
     .btn-ghost:hover {
-      border-color:#111111; color:#111111;
+      border-color: var(--text-primary); color: var(--text-primary);
       transform:translateY(-4px);
-      background:rgba(0,0,0,0.045);
+      background: var(--badge-bg);
     }
     .hero-visual {
       position:relative; width:100%; max-width:600px; height:440px;
@@ -335,6 +512,119 @@
       touch-action:pan-y; cursor:grab;
     }
     #hero3dCanvas:active { cursor:grabbing; }
+    .hero-part-tooltip {
+      position:absolute; z-index:4;
+      display:none; top:50%; left:0;
+      width:47%;
+      max-height:calc(100% - 32px);
+      overflow:auto;
+      padding:20px 20px 16px;
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:16px;
+      background:rgba(17,21,27,0.96);
+      box-shadow:0 18px 48px rgba(0,0,0,0.38), 0 0 32px var(--primary-glow, rgba(6,182,212,0.12));
+      color:#f5f5f4;
+      font-family:'Manrope',sans-serif;
+      line-height:1.55;
+      transform:translateY(-50%);
+      pointer-events:none;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      animation:heroPartCardIn 0.22s ease-out both;
+    }
+    .hero-part-tooltip.is-pinned { pointer-events:auto; }
+    .hero-visual.has-part-details #hero3dCanvas {
+      left:49%; width:51%;
+    }
+    .hero-visual.has-part-details .hero-scene-label-top { left:51%; }
+    .hero-part-connector {
+      position:absolute; inset:0; z-index:2;
+      width:100%; height:100%;
+      overflow:visible; pointer-events:none;
+      opacity:0;
+      transition:opacity 0.18s ease;
+    }
+    .hero-visual.has-part-details .hero-part-connector { opacity:1; }
+    .hero-part-connector path {
+      fill:none; stroke:var(--primary-light, #38bdf8);
+      stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round;
+      stroke-dasharray:5 5; opacity:0.8;
+    }
+    .hero-part-connector circle {
+      fill:var(--primary-light, #38bdf8);
+      stroke:rgba(255,255,255,0.82); stroke-width:1.5;
+    }
+    .hero-part-card-header {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:12px;
+      color:var(--primary-light, #38bdf8);
+      font-family:'Space Grotesk',sans-serif;
+      font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    }
+    .hero-part-category { display:flex; align-items:center; gap:8px; }
+    .hero-part-category::before {
+      content:''; width:7px; height:7px; flex:none;
+      border-radius:50%; background:var(--primary);
+      box-shadow:0 0 12px var(--primary);
+    }
+    .hero-part-status {
+      flex:none; padding:3px 9px;
+      border:1px solid var(--primary-glow-strong, rgba(6,182,212,0.45));
+      border-radius:6px; background:var(--primary-glow, rgba(6,182,212,0.12));
+      color:var(--primary-light, #38bdf8);
+      font-size:11px; letter-spacing:0.4px;
+    }
+    .hero-part-close {
+      display:none; flex:none;
+      width:28px; height:28px; padding:0;
+      border:1px solid rgba(255,255,255,0.14); border-radius:7px;
+      background:transparent; color:#d5d9df; font-size:19px; line-height:1;
+      cursor:pointer;
+    }
+    .hero-part-tooltip.is-pinned .hero-part-close {
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+    .hero-part-title {
+      margin:0 0 8px;
+      color:#f7f8fa;
+      font-family:'Space Grotesk',sans-serif;
+      font-size:20px; font-weight:700; letter-spacing:-0.35px; line-height:1.25;
+    }
+    .hero-part-description {
+      margin:0; color:#aab3c0; font-size:14px; line-height:1.6;
+    }
+    .hero-part-specs {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-top:14px; padding-top:12px;
+      border-top:1px solid rgba(255,255,255,0.1);
+      color:#8994a2;
+      font-family:'Space Grotesk',sans-serif;
+      font-size:11px; letter-spacing:0.7px; text-transform:uppercase;
+    }
+    .hero-part-spec-value {
+      color:var(--primary-light, #38bdf8);
+      font-size:12px; font-weight:700; text-align:right;
+    }
+    @keyframes heroPartCardIn {
+      from { opacity:0; }
+      to { opacity:1; }
+    }
+    @media(max-width:576px) {
+      .hero-visual.has-part-details #hero3dCanvas {
+        left:0; top:0; width:100%; height:58%;
+      }
+      .hero-visual.has-part-details .hero-scene-label-top { left:0; }
+      .hero-part-connector { display:none; }
+      .hero-part-tooltip {
+        top:auto; bottom:8px; left:8px;
+        width:calc(100% - 16px); max-height:40%;
+        padding:14px 14px 12px;
+        transform:none;
+      }
+      .hero-part-title { font-size:17px; }
+      .hero-part-description { font-size:12px; }
+      .hero-part-card-header { font-size:10px; letter-spacing:0.8px; }
+    }
     .hero-scene-fallback {
       position:absolute; inset:28px 32px; z-index:0;
       display:grid; place-items:center;
@@ -386,9 +676,9 @@
     ═══════════════════════════════════════════ */
     #stats-strip {
       position:relative; z-index:1;
-      background: #d1d1d1;
-      border-top:1px solid rgba(70,70,70,0.16);
-      border-bottom:1px solid rgba(70,70,70,0.16);
+      background: var(--stats-bg);
+      border-top:1px solid var(--border-subtle);
+      border-bottom:1px solid var(--border-subtle);
       padding:0;
     }
     .stat-col {
@@ -501,15 +791,15 @@
     /* ═══════════════════════════════════════════
        FEATURES — 3D FLIP CARDS
     ═══════════════════════════════════════════ */
-    #features { background:var(--black-2); }
+    #features { background:var(--bg-surface); }
     .flip-card {
-      height:320px; perspective:1100px;
+      height:360px; perspective:1100px;   /* increased from 320px to give room */
       cursor:pointer; margin-bottom:24px;
     }
     .flip-card-inner {
       position:relative; width:100%; height:100%;
       transform-style:preserve-3d;
-      transition:transform 0.7s cubic-bezier(0.4,0.2,0.2,1);
+      transition:transform 0.7s cubic-bezier(0.4,0.2,0.2,1) !important;
     }
     .flip-card:hover .flip-card-inner,
     .flip-card:focus-within .flip-card-inner { transform:rotateY(180deg); }
@@ -520,37 +810,38 @@
       border:1px solid rgba(115,115,115,0.1);
     }
     .flip-front {
-      background:var(--black-3);
+      background: var(--flip-card-front);
       padding:0;
       overflow:hidden;
       transform-style:preserve-3d;
-      transition:border-color var(--transition);
+      transition:border-color var(--transition) !important;
     }
     .flip-front::before {
-      content:''; position:absolute; z-index:0; top:15px; left:14px; right:6px; height:142px;
-      background:#c8c5bd; border:1px solid rgba(43,43,43,0.16); border-radius:9px;
-      box-shadow:0 14px 20px rgba(43,43,43,0.16);
+      content:''; position:absolute; z-index:0; top:15px; left:14px; right:6px; height:148px;
+      background: var(--flip-card-bg-1);
+      border:1px solid var(--border-card); border-radius:9px;
+      box-shadow:0 14px 20px var(--shadow-card);
       transform:translateZ(6px) rotateX(2deg);
-      transition:transform 0.55s cubic-bezier(0.2,0.7,0.2,1),box-shadow 0.45s ease;
+      transition:transform 0.55s cubic-bezier(0.2,0.7,0.2,1),box-shadow 0.45s ease !important;
     }
     .flip-front::after {
       content:'';
-      position:absolute; z-index:2; top:10px; left:10px; right:10px; height:142px;
+      position:absolute; z-index:2; top:10px; left:10px; right:10px; height:148px;
       border-radius:8px;
       background:linear-gradient(110deg,rgba(43,43,43,0.14),rgba(43,43,43,0.02)),linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.3) 47%,transparent 62%);
       transform:translateZ(24px);
-      transition:opacity 0.5s ease,transform 0.55s ease;
+      transition:opacity 0.5s ease,transform 0.55s ease !important;
       pointer-events:none;
     }
     .feature-image {
       position:relative; z-index:1;
-      display:block; width:calc(100% - 20px); height:142px; margin:10px 10px 0;
+      display:block; width:calc(100% - 20px); height:148px; margin:10px 10px 0;
       object-fit:cover; border:1px solid rgba(43,43,43,0.2); border-radius:8px;
       filter:grayscale(0.62) saturate(0.72) contrast(1.12) brightness(1.02);
       transform:perspective(800px) rotateX(5deg) rotateY(-1.5deg) translateZ(24px) scale(1.035);
       transform-origin:center top;
       box-shadow:0 18px 24px rgba(43,43,43,0.22),0 5px 0 rgba(115,115,115,0.72);
-      transition:transform 0.55s cubic-bezier(0.2,0.7,0.2,1),filter 0.45s ease,box-shadow 0.45s ease;
+      transition:transform 0.55s cubic-bezier(0.2,0.7,0.2,1),filter 0.45s ease,box-shadow 0.45s ease !important;
     }
     .flip-card:hover .feature-image,
     .flip-card:focus-within .feature-image {
@@ -561,9 +852,11 @@
     .flip-card:hover .flip-front::after,
     .flip-card:focus-within .flip-front::after { opacity:0.72; }
     .flip-front-content {
-      position:relative; z-index:3; padding:12px 24px 16px;
+      position:relative; z-index:3;
+      /* 20-24px gap between image bottom and icon box */
+      padding:22px 24px 16px;
       transform:translateZ(28px);
-      transition:transform 0.55s cubic-bezier(0.2,0.7,0.2,1);
+      transition:transform 0.55s cubic-bezier(0.2,0.7,0.2,1) !important;
     }
     .flip-card:hover .flip-front::before,
     .flip-card:focus-within .flip-front::before {
@@ -574,19 +867,21 @@
     .flip-card:focus-within .flip-front-content { transform:translateZ(34px); }
     .flip-card:hover .flip-front { border-color:rgba(115,115,115,0.3); }
     .flip-back {
-      background: linear-gradient(145deg, rgba(115,115,115,0.1), rgba(115,115,115,0.04));
-      border-color:rgba(115,115,115,0.35);
+      background: linear-gradient(145deg, var(--bg-surface-2), var(--bg-surface));
+      border-color:rgba(115,115,115,0.25);
       transform:rotateY(180deg);
       display:flex; flex-direction:column; justify-content:space-between;
     }
+    /* Icon box — 16px gap between icon and title */
     .flip-icon {
       width:40px; height:40px;
       background:var(--gold-glow);
       border:1px solid rgba(115,115,115,0.2);
       border-radius:13px;
       display:flex; align-items:center; justify-content:center;
-      font-size:18px; color:var(--gold); margin-bottom:8px;
-      transition:all var(--transition);
+      font-size:18px; color:var(--gold);
+      margin-bottom:14px;   /* 14px gap between icon and title */
+      transition:all var(--transition) !important;
     }
     .flip-card:hover .flip-icon {
       background:var(--gold-glow-med);
@@ -594,29 +889,40 @@
     }
     .flip-front h3 {
       font-family:'Space Grotesk',sans-serif;
-      font-size:17px; font-weight:700; margin-bottom:6px;
+      font-size:17px; font-weight:700;
+      margin-bottom:8px;
+      color: var(--text-primary);
     }
-    .flip-front p { color:var(--gray); font-size:12.5px; line-height:1.5; }
+    .flip-front p {
+      color:var(--text-secondary); font-size:12.5px; line-height:1.6;
+      /* right padding so text doesn't overlap ghost number */
+      padding-right:52px;
+    }
+    /* Ghost numbers — pushed to bottom-right corner, behind text, low opacity */
     .flip-num {
-      position:absolute; bottom:20px; right:24px;
-      z-index:3; transform:translateZ(24px);
+      position:absolute;
+      bottom:14px; right:16px;
+      z-index:1;              /* behind content (z-index:3) */
+      transform:translateZ(4px);
       font-family:'Space Grotesk',sans-serif;
-      font-size:54px; font-weight:800;
-      color:rgba(115,115,115,0.15); line-height:1;
-      user-select:none; transition:color var(--transition);
+      font-size:52px; font-weight:800;
+      color:rgba(115,115,115,0.1); line-height:1;
+      user-select:none;
+      pointer-events:none;
+      transition:color var(--transition) !important;
     }
-    .flip-card:hover .flip-num { color:rgba(115,115,115,0.3); }
+    .flip-card:hover .flip-num { color:rgba(115,115,115,0.18); }
     .flip-back h3 {
       font-family:'Space Grotesk',sans-serif;
       font-size:18px; font-weight:700;
       color:var(--gold); margin-bottom:12px;
     }
-    .flip-back p { color:var(--gray-light); font-size:14px; line-height:1.7; }
+    .flip-back p { color:var(--text-muted); font-size:14px; line-height:1.7; }
     .flip-link {
       display:inline-flex; align-items:center; gap:6px;
       color:var(--gold); font-size:13px; font-weight:700;
       text-decoration:none; margin-top:14px;
-      transition:gap var(--transition);
+      transition:gap var(--transition) !important;
     }
     .flip-link:hover { gap:12px; color:var(--gold-light); }
 
@@ -963,6 +1269,11 @@
       position:relative; transition:all var(--transition);
       overflow:hidden;
     }
+    .pricing-cards > [class*="col-"] { display:flex; }
+    .pricing-cards .price-card {
+      display:flex; flex-direction:column;
+      width:100%; height:100%;
+    }
     .price-card::after {
       content:''; position:absolute; inset:0;
       background: linear-gradient(110deg,
@@ -979,11 +1290,10 @@
     .price-card.featured {
       background: linear-gradient(145deg, rgba(115,115,115,0.1), rgba(115,115,115,0.03));
       border-color:rgba(115,115,115,0.45);
-      transform:scale(1.04);
       box-shadow:0 0 80px rgba(115,115,115,0.12);
     }
     .popular-pill {
-      position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+      position:absolute; top:10px; left:50%; transform:translateX(-50%);
       background: linear-gradient(135deg, var(--gold), var(--gold-dim));
       color:#2b2b2b; font-size:10px; font-weight:800;
       padding:5px 18px; border-radius:50px;
@@ -999,7 +1309,7 @@
     .plan-price sup { font-size:22px; font-weight:500; vertical-align:super; }
     .plan-price .period { font-size:17px; font-weight:400; color:var(--gray); }
     .plan-sub { font-size:13px; color:var(--gray); margin-bottom:30px; }
-    .plan-feats { list-style:none; margin-bottom:34px; }
+    .plan-feats { list-style:none; margin-bottom:34px; padding-left:0; flex:1 0 auto; }
     .plan-feats li {
       padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05);
       font-size:14px; color:var(--gray-light);
@@ -1021,6 +1331,8 @@
       text-decoration:none; transition:all var(--transition);
       background:transparent; width:100%; cursor:pointer;
     }
+    .pricing-cards .plan-btn-gold,
+    .pricing-cards .plan-btn-outline { margin-top:auto; }
     .plan-btn-outline:hover {
       background:var(--gold-glow-med);
       border-color:var(--gold);
@@ -1241,7 +1553,7 @@
       footer { padding:50px 0 0; }
     }
 
-    :root { --site-grid-line: rgba(82,82,82,0.12); }
+    :root { --site-grid-line: var(--grid-line); }
     #hero, #stats-strip, #marquee-section, #features, #integrations, #dashboard,
     #pipeline, #insights-wall, #testimonials, #pricing, #cta, footer {
       background-image:
@@ -1250,13 +1562,77 @@
       background-size:32px 32px;
     }
     .hex-bg { opacity:0.28; }
+
+    /* ═══════════════════════════════════════════
+       DARK MODE — specific overrides
+    ═══════════════════════════════════════════ */
+    [data-theme="dark"] #hero { color: var(--hero-text); }
+    [data-theme="dark"] .hero-heading .typed-wrap {
+      background: linear-gradient(135deg, var(--hero-text), #9a9690);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    [data-theme="dark"] .hero-scene-label {
+      background: rgba(26,26,26,0.92);
+      border-color: rgba(255,255,255,0.1);
+      color: var(--text-primary);
+    }
+    [data-theme="dark"] .fallback-rack {
+      background: #2a2a2a;
+      border-color: rgba(180,175,165,0.3);
+    }
+    [data-theme="dark"] .fallback-rack-unit {
+      background:#3d3d3d; border-color:#555; color: var(--text-primary);
+    }
+    [data-theme="dark"] .btn-close { filter: invert(1); }
+    [data-theme="dark"] .hero-badge { background: var(--badge-bg); border-color: var(--badge-border); color: var(--badge-text); }
+    /* Feature image — slightly more vivid in dark */
+    [data-theme="dark"] .feature-image {
+      filter:grayscale(0.4) saturate(0.85) contrast(1.1) brightness(0.85);
+    }
+    [data-theme="dark"] .flip-card:hover .feature-image,
+    [data-theme="dark"] .flip-card:focus-within .feature-image {
+      filter:grayscale(0.25) saturate(1) contrast(1.1) brightness(0.95);
+    }
+    /* Hex tiles in dark */
+    [data-theme="dark"] .hex-tile {
+      background:linear-gradient(145deg,rgba(50,50,50,0.9),rgba(35,35,35,0.7));
+      color: var(--text-secondary);
+      border-color: rgba(255,255,255,0.08);
+      box-shadow:0 22px 34px rgba(0,0,0,0.4),0 6px 0 rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    [data-theme="dark"] .hex-tile:hover { color: var(--gold); background:linear-gradient(145deg,rgba(60,60,60,0.95),rgba(45,45,45,0.8)); }
+    /* Mobile card fix */
+    @media(max-width:576px) {
+      .flip-card { height:340px; }
+      .flip-front p { padding-right:40px; }
+    }
   </style>
 </head>
 <body>
 
-<!-- ── CURSOR ── -->
-<div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
+<!-- ── SCI-FI CURSOR & PARTICLE TRAIL OVERLAY ── -->
+<canvas id="cursor-trail-canvas"></canvas>
+<div id="sci-fi-cursor" class="sci-fi-cursor" aria-hidden="true">
+  <div class="sci-fi-cursor-ring"></div>
+  <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cursorGrad" x1="2" y1="5" x2="26" y2="14" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="45%" stop-color="var(--primary-light, #38bdf8)"/>
+        <stop offset="100%" stop-color="var(--primary, #06b6d4)"/>
+      </linearGradient>
+      <filter id="cursorCoreGlow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.5" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+    </defs>
+    <!-- Sleek Supersonic Delta Dart / Arrowhead Pointer -->
+    <path d="M25 14L4 5.5L9 14L4 22.5L25 14Z" fill="url(#cursorGrad)" stroke="#ffffff" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M9 14L23 14" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="10" cy="14" r="1.8" fill="#ffffff" filter="url(#cursorCoreGlow)"/>
+  </svg>
+</div>
 
 <!-- ── LOADER ── -->
 <div id="loader">
@@ -1291,10 +1667,15 @@
         <li class="nav-item"><a class="nav-link nav-link-custom" href="#dashboard">Platform</a></li>
         <li class="nav-item"><a class="nav-link nav-link-custom" href="#pipeline">Pipeline</a></li>
         <li class="nav-item"><a class="nav-link nav-link-custom" href="#pricing">Pricing</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-custom text-nowrap" href="data_stream_trail.html" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-cube me-1"></i>3D Server Rack</a></li>
       </ul>
     </div>
 
-    <div class="d-none d-lg-flex">
+    <div class="d-none d-lg-flex align-items-center gap-2">
+      <!-- Theme Toggle -->
+      <button id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
       <a href="#cta" class="nav-link nav-link-custom nav-btn-cta">Get Started <i class="fa-solid fa-arrow-right ms-1"></i></a>
     </div>
   </div>
@@ -1316,10 +1697,18 @@
       <li class="nav-item"><a class="nav-link nav-link-custom" data-bs-dismiss="offcanvas" href="#dashboard">Platform</a></li>
       <li class="nav-item"><a class="nav-link nav-link-custom" data-bs-dismiss="offcanvas" href="#pipeline">Pipeline</a></li>
       <li class="nav-item"><a class="nav-link nav-link-custom" data-bs-dismiss="offcanvas" href="#pricing">Pricing</a></li>
+      <li class="nav-item"><a class="nav-link nav-link-custom" href="data_stream_trail.html" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-cube me-1"></i>3D Server Rack (Concept 04)</a></li>
     </ul>
     <a href="#cta" class="btn-forge mt-4 w-100 justify-content-center" data-bs-dismiss="offcanvas">
       Get Started Free <i class="fa-solid fa-arrow-right"></i>
     </a>
+    <!-- Mobile theme toggle -->
+    <button id="themeToggleMobile" class="mt-3 w-100 d-flex align-items-center justify-content-center gap-2"
+      style="background:var(--gold-glow);border:1px solid rgba(115,115,115,0.25);border-radius:9px;padding:11px 16px;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;"
+      aria-label="Toggle theme">
+      <i class="fa-solid fa-moon" id="themeIconMobile"></i>
+      <span id="themeTextMobile">Dark Mode</span>
+    </button>
   </div>
 </div>
 
@@ -1359,6 +1748,23 @@
 
     <div class="hero-visual" role="img" aria-label="Three-dimensional DataForge server rack with compute nodes and coral status lights">
       <canvas id="hero3dCanvas" aria-hidden="true"></canvas>
+      <svg class="hero-part-connector" id="heroPartConnector" aria-hidden="true">
+        <path id="heroPartConnectorPath"></path>
+        <circle id="heroPartConnectorDot" r="4"></circle>
+      </svg>
+      <section class="hero-part-tooltip" id="heroPartTooltip" role="status" aria-live="polite" aria-hidden="true">
+        <div class="hero-part-card-header">
+          <span class="hero-part-category" id="heroPartCategory"></span>
+          <span class="hero-part-status" id="heroPartStatus"></span>
+          <button type="button" class="hero-part-close" id="heroPartClose" aria-label="Close component details">&times;</button>
+        </div>
+        <h3 class="hero-part-title" id="heroPartTitle"></h3>
+        <p class="hero-part-description" id="heroPartDescription"></p>
+        <div class="hero-part-specs">
+          <span id="heroPartSpecLabel"></span>
+          <span class="hero-part-spec-value" id="heroPartSpecValue"></span>
+        </div>
+      </section>
       <div class="hero-scene-fallback" aria-hidden="true">
         <div class="fallback-rack">
           <div class="fallback-rack-unit"><i class="fa-solid fa-microchip"></i><span class="fallback-rack-lights"><span></span><span></span><span></span></span></div>
@@ -1713,8 +2119,8 @@
               stroke="url(#pipeGrad)" stroke-width="2.5" stroke-linecap="round"/>
         <defs>
           <linearGradient id="pipeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#a3a3a3"/>
-            <stop offset="100%" stop-color="#9a9a9a"/>
+            <stop offset="0%" stop-color="var(--primary, #06b6d4)"/>
+            <stop offset="100%" stop-color="var(--primary-light, #38bdf8)"/>
           </linearGradient>
         </defs>
       </svg>
@@ -1887,9 +2293,9 @@
       <span class="save-badge ms-2">Save 30%</span>
     </div>
 
-    <div class="row g-4 justify-content-center">
+    <div class="row g-4 justify-content-center pricing-cards">
       <!-- Starter -->
-      <div class="col-md-4 col-lg-3 reveal">
+      <div class="col-md-4 col-lg-4 reveal">
         <div class="price-card">
           <div class="plan-name">Starter</div>
           <div class="plan-price">
@@ -1932,7 +2338,7 @@
       </div>
 
       <!-- Enterprise -->
-      <div class="col-md-4 col-lg-3 reveal">
+      <div class="col-md-4 col-lg-4 reveal">
         <div class="price-card">
           <div class="plan-name">Enterprise</div>
           <div class="plan-price">
@@ -2072,6 +2478,79 @@
   </div>
 </footer>
 
+<!-- ── THEME STUDIO CONTROLLER ── -->
+<button id="themeStudioTrigger" aria-label="Open Theme Studio" title="Customize website theme colors" aria-expanded="false" aria-controls="themeStudioPanel">
+  <span class="theme-trigger-glow-ring" aria-hidden="true"></span>
+  <i class="fa-solid fa-palette" aria-hidden="true"></i>
+</button>
+
+<div id="themeStudioPanel" role="dialog" aria-modal="false" aria-label="Theme Color Customizer">
+  <div class="theme-panel-header">
+    <h4 class="theme-panel-title">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Theme Studio
+    </h4>
+    <button class="theme-panel-close" id="themeStudioClose" aria-label="Close Theme Studio">&times;</button>
+  </div>
+
+  <!-- Section 1: Color Presets -->
+  <div class="theme-panel-label">
+    <span>Accent Palette</span>
+    <span class="active-name" id="themeActiveName">Cyan</span>
+  </div>
+  <div class="theme-swatches-grid" role="radiogroup" aria-label="Preset theme colors">
+    <button class="theme-swatch active" data-color="#06b6d4" data-name="Cyan / Ice" style="background:#06b6d4;" title="Cyan / Ice" aria-label="Cyan / Ice"></button>
+    <button class="theme-swatch" data-color="#8b5cf6" data-name="Electric Indigo" style="background:#8b5cf6;" title="Electric Indigo" aria-label="Electric Indigo"></button>
+    <button class="theme-swatch" data-color="#10b981" data-name="Emerald Matrix" style="background:#10b981;" title="Emerald Matrix" aria-label="Emerald Matrix"></button>
+    <button class="theme-swatch" data-color="#f43f5e" data-name="Cyber Crimson" style="background:#f43f5e;" title="Cyber Crimson" aria-label="Cyber Crimson"></button>
+    <button class="theme-swatch" data-color="#ec4899" data-name="Neon Fuchsia" style="background:#ec4899;" title="Neon Fuchsia" aria-label="Neon Fuchsia"></button>
+    <button class="theme-swatch" data-color="#f59e0b" data-name="Amber Gold" style="background:#f59e0b;" title="Amber Gold" aria-label="Amber Gold"></button>
+    <button class="theme-swatch" data-color="#1e3a8a" data-name="Classic Navy" style="background:#1e3a8a;" title="Classic Navy" aria-label="Classic Navy"></button>
+    <button class="theme-swatch" data-color="#475569" data-name="Modern Slate" style="background:#475569;" title="Modern Slate" aria-label="Modern Slate"></button>
+    <button class="theme-swatch" data-color="#2563eb" data-name="Royal Blue" style="background:#2563eb;" title="Royal Blue" aria-label="Royal Blue"></button>
+    <button class="theme-swatch" data-color="#0f766e" data-name="Executive Teal" style="background:#0f766e;" title="Executive Teal" aria-label="Executive Teal"></button>
+    <button class="theme-swatch" data-color="#166534" data-name="Forest Green" style="background:#166534;" title="Forest Green" aria-label="Forest Green"></button>
+    <button class="theme-swatch" data-color="#9f1239" data-name="Burgundy" style="background:#9f1239;" title="Burgundy" aria-label="Burgundy"></button>
+    <button class="theme-swatch" data-color="#ffffff" data-name="Pure White" style="background:#ffffff;" title="Pure White" aria-label="Pure White"></button>
+    <button class="theme-swatch" data-color="#000000" data-name="Jet Black" style="background:#000000;" title="Jet Black" aria-label="Jet Black"></button>
+    <button class="theme-swatch" data-color="#3b6b8f" data-name="Steel Blue" style="background:#3b6b8f;" title="Steel Blue" aria-label="Steel Blue"></button>
+    <button class="theme-swatch" data-color="#2f9e84" data-name="Soft Mint" style="background:#2f9e84;" title="Soft Mint" aria-label="Soft Mint"></button>
+    <button class="theme-swatch" data-color="#7e4a8e" data-name="Muted Plum" style="background:#7e4a8e;" title="Muted Plum" aria-label="Muted Plum"></button>
+    <button class="theme-swatch" data-color="#e76f51" data-name="Warm Coral" style="background:#e76f51;" title="Warm Coral" aria-label="Warm Coral"></button>
+    <button class="theme-swatch" data-color="#c49a45" data-name="Champagne Gold" style="background:#c49a45;" title="Champagne Gold" aria-label="Champagne Gold"></button>
+  </div>
+
+  <!-- Section 2: Custom Color Picker -->
+  <div class="theme-panel-label"><span>Custom Color</span></div>
+  <div class="theme-custom-row">
+    <label class="theme-color-input-wrap" for="themeCustomColor">
+      <input type="color" id="themeCustomColor" value="#06b6d4" aria-label="Pick custom accent color"/>
+      <span class="theme-hex-code" id="themeHexDisplay">#06B6D4</span>
+    </label>
+    <span class="theme-custom-badge">Live Sync</span>
+  </div>
+
+  <!-- Section 3: Dark / Light Mode -->
+  <div class="theme-panel-label"><span>Base Mode</span></div>
+  <div class="theme-mode-row">
+    <span style="font-size:12px; font-weight:600; color:var(--text-primary);">Theme Appearance</span>
+    <div class="theme-mode-btn-group" role="group" aria-label="Theme Mode Selection">
+      <button type="button" class="theme-mode-opt-btn active" id="themeModeDark">
+        <i class="fa-solid fa-moon"></i> Dark
+      </button>
+      <button type="button" class="theme-mode-opt-btn" id="themeModeLight">
+        <i class="fa-solid fa-sun"></i> Light
+      </button>
+    </div>
+  </div>
+
+  <!-- Section 4: Footer / Reset -->
+  <div class="theme-panel-footer">
+    <button type="button" class="theme-reset-btn" id="themeResetBtn" title="Reset theme to default">
+      <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+    </button>
+  </div>
+</div>
+
 <!-- ── BACK TO TOP ── -->
 <button id="back-top" onclick="scrollTo({top:0,behavior:'smooth'})">
   <i class="fa-solid fa-arrow-up"></i>
@@ -2120,78 +2599,18 @@ window.addEventListener('load', () => {
 });
 
 /* ════════════════════════════════════════════
-   CUSTOM CURSOR
-════════════════════════════════════════════ */
-const dot  = document.getElementById('cursor-dot');
-const ring = document.getElementById('cursor-ring');
-const pointerTarget = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-const dotPosition = { ...pointerTarget };
-const ringPosition = { ...pointerTarget };
-let cursorFrame = null;
-let targetDotScale = 1;
-let currentDotScale = 1;
-
-function animateCursor() {
-  dotPosition.x += (pointerTarget.x - dotPosition.x) * 0.42;
-  dotPosition.y += (pointerTarget.y - dotPosition.y) * 0.42;
-  ringPosition.x += (pointerTarget.x - ringPosition.x) * 0.16;
-  ringPosition.y += (pointerTarget.y - ringPosition.y) * 0.16;
-  currentDotScale += (targetDotScale - currentDotScale) * 0.3;
-
-  dot.style.transform = `translate3d(${dotPosition.x}px, ${dotPosition.y}px, 0) translate(-50%, -50%) scale(${currentDotScale})`;
-  ring.style.transform = `translate3d(${ringPosition.x}px, ${ringPosition.y}px, 0) translate(-50%, -50%)`;
-
-  const stillMoving = Math.abs(pointerTarget.x - dotPosition.x) > 0.1 ||
-    Math.abs(pointerTarget.y - dotPosition.y) > 0.1 ||
-    Math.abs(pointerTarget.x - ringPosition.x) > 0.1 ||
-    Math.abs(pointerTarget.y - ringPosition.y) > 0.1 ||
-    Math.abs(targetDotScale - currentDotScale) > 0.01;
-  cursorFrame = stillMoving ? requestAnimationFrame(animateCursor) : null;
-}
-
-document.addEventListener('pointermove', event => {
-  if (event.pointerType === 'touch') return;
-  pointerTarget.x = event.clientX;
-  pointerTarget.y = event.clientY;
-  dot.style.opacity = '1';
-  ring.style.opacity = '0.7';
-  if (cursorFrame === null) cursorFrame = requestAnimationFrame(animateCursor);
-});
-
-function hideCustomCursor() {
-  dot.style.opacity = '0';
-  ring.style.opacity = '0';
-  targetDotScale = 1;
-  ring.classList.remove('is-hovered');
-}
-
-document.documentElement.addEventListener('pointerleave', hideCustomCursor);
-window.addEventListener('blur', hideCustomCursor);
-document.querySelectorAll('a,button,.flip-card,.hex-tile').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    targetDotScale = 2.5;
-    ring.classList.add('is-hovered');
-    ring.style.width = '55px'; ring.style.height = '55px';
-    ring.style.borderColor = 'var(--gold-light)';
-    if (cursorFrame === null) cursorFrame = requestAnimationFrame(animateCursor);
-  });
-  el.addEventListener('mouseleave', () => {
-    targetDotScale = 1;
-    ring.classList.remove('is-hovered');
-    ring.style.width = '36px'; ring.style.height = '36px';
-    ring.style.borderColor = 'var(--gold)';
-    if (cursorFrame === null) cursorFrame = requestAnimationFrame(animateCursor);
-  });
-});
-
-/* ════════════════════════════════════════════
    INIT AFTER LOAD
 ════════════════════════════════════════════ */
 function initAnimations() {
-  // Typed.js
+  // Typed.js — smooth, consistent speed; no layout shift (min-height on .typed-wrap reserves space)
   new Typed('#typed-text', {
     strings: ['Business Gold', 'Competitive Edge', 'Smarter Decisions', 'Data Excellence', 'Your Future'],
-    typeSpeed: 75, backSpeed: 45, backDelay: 1800, loop: true, smartBackspace: true
+    typeSpeed: 72,
+    backSpeed: 42,
+    backDelay: 2000,
+    loop: true,
+    smartBackspace: true,
+    cursorChar: '|'
   });
 
   // GSAP-like stagger via CSS classes + timeouts
@@ -2229,6 +2648,11 @@ function resizeCanvas() {
   H = canvas.height = window.innerHeight;
 }
 
+let heroParticleColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#06b6d4';
+window.addEventListener('themeColorChange', () => {
+  heroParticleColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#06b6d4';
+});
+
 class Particle {
   constructor() { this.reset(); }
   reset() {
@@ -2247,7 +2671,7 @@ class Particle {
   draw() {
     ctx.save();
     ctx.globalAlpha = this.a;
-    ctx.fillStyle = this.gold ? '#a3a3a3' : '#ffffff';
+    ctx.fillStyle = this.gold ? heroParticleColor : '#ffffff';
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
@@ -2257,50 +2681,83 @@ class Particle {
 
 function initParticles() {
   particles = [];
-  for (let i = 0; i < 110; i++) particles.push(new Particle());
+  for (let i = 0; i < 72; i++) particles.push(new Particle());
 }
 
 function drawConnections() {
+  ctx.beginPath();
   for (let i = 0; i < particles.length; i++) {
     for (let j = i + 1; j < particles.length; j++) {
       const dx = particles[i].x - particles[j].x;
       const dy = particles[i].y - particles[j].y;
-      const d  = Math.sqrt(dx*dx + dy*dy);
-      if (d < 110) {
-        ctx.save();
-        ctx.globalAlpha = (1 - d/110) * 0.07;
-        ctx.strokeStyle = '#a3a3a3';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
+      if (dx * dx + dy * dy < 12100) {
         ctx.moveTo(particles[i].x, particles[i].y);
         ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.stroke();
-        ctx.restore();
       }
     }
   }
+  ctx.globalAlpha = 0.06;
+  ctx.strokeStyle = heroParticleColor;
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
 }
 
-(function animParticles() {
+let particleFrameId = null;
+let particleAnimationActive = false;
+let lastParticleFrame = 0;
+
+function scheduleParticleFrame() {
+  if (particleFrameId === null && particleAnimationActive && !document.hidden) {
+    particleFrameId = requestAnimationFrame(animParticles);
+  }
+}
+
+function animParticles(timestamp) {
+  particleFrameId = null;
+  if (!particleAnimationActive || document.hidden) return;
+  const frameScale = lastParticleFrame
+    ? Math.min((timestamp - lastParticleFrame) / (1000 / 60), 2)
+    : 1;
+  lastParticleFrame = timestamp;
   ctx.clearRect(0, 0, W, H);
   drawConnections();
-  particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animParticles);
-})();
+  particles.forEach(p => { p.update(frameScale); p.draw(); });
+  scheduleParticleFrame();
+}
 
-window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
 resizeCanvas(); initParticles();
+const heroParticleObserver = new IntersectionObserver(entries => {
+  particleAnimationActive = entries.some(entry => entry.isIntersecting);
+  if (particleAnimationActive) {
+    lastParticleFrame = 0;
+    scheduleParticleFrame();
+  }
+});
+heroParticleObserver.observe(document.getElementById('hero'));
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    lastParticleFrame = 0;
+    scheduleParticleFrame();
+  }
+});
+window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
 
 /* ════════════════════════════════════════════
    NAVBAR SCROLL
 ════════════════════════════════════════════ */
 const nav = document.getElementById('mainNav');
 const navLinks = document.querySelectorAll('.nav-link-custom');
+let scrollUpdateFrame = null;
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
-  document.getElementById('back-top').classList.toggle('show', window.scrollY > 400);
-  updateNavSpy();
-});
+  if (scrollUpdateFrame !== null) return;
+  scrollUpdateFrame = requestAnimationFrame(() => {
+    scrollUpdateFrame = null;
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+    document.getElementById('back-top').classList.toggle('show', window.scrollY > 400);
+    updateNavSpy();
+  });
+}, { passive: true });
 
 function updateNavSpy() {
   const sections = document.querySelectorAll('section[id], div[id]');
@@ -2383,86 +2840,102 @@ document.getElementById('intSearch').addEventListener('input', function() {
 });
 
 /* ════════════════════════════════════════════
-   CHART.JS
+   CHART.JS (Dynamic Theme Synchronized)
 ════════════════════════════════════════════ */
-const goldColor = 'rgba(115,115,115,1)';
-const goldFade  = 'rgba(115,115,115,0.12)';
-const goldDim   = 'rgba(94,94,94,0.8)';
-const labels7   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+function getChartColors() {
+  const root = document.documentElement;
+  const primary = getComputedStyle(root).getPropertyValue('--primary').trim() || '#06b6d4';
+  const rgb = getComputedStyle(root).getPropertyValue('--primary-rgb').trim() || '6, 182, 212';
+  return {
+    color: primary,
+    fade: `rgba(${rgb}, 0.18)`,
+    dim: `rgba(${rgb}, 0.75)`,
+    glow: `rgba(${rgb}, 0.35)`
+  };
+}
+
+const labels7 = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 Chart.defaults.color = '#777';
 Chart.defaults.borderColor = 'rgba(43,43,43,0.12)';
 
-const chartData = {
-  line: {
-    type: 'line',
-    data: {
-      labels: labels7,
-      datasets: [{
-        label:'Revenue ($k)',
-        data:[312,480,396,542,498,620,754],
-        borderColor: goldColor,
-        backgroundColor: goldFade,
-        tension:0.45, fill:true, pointBackgroundColor: goldColor,
-        pointRadius:4, pointHoverRadius:7,
-      }]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:false } },
-      scales:{
-        x:{ grid:{ color:'rgba(43,43,43,0.08)' }, ticks:{color:'#555'} },
-        y:{ grid:{ color:'rgba(43,43,43,0.08)' }, ticks:{color:'#555'} }
-      }
-    }
-  },
-  bar: {
-    type:'bar',
-    data:{
-      labels:labels7,
-      datasets:[{
-        label:'Active Users',
-        data:[9200,11400,10800,12600,11900,8400,14200],
-        backgroundColor: goldFade,
-        borderColor: goldColor,
-        borderWidth:2,
-        borderRadius:6,
-        hoverBackgroundColor:'rgba(115,115,115,0.3)',
-      }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:false } },
-      scales:{
-        x:{ grid:{display:false}, ticks:{color:'#666'} },
-        y:{ grid:{ color:'rgba(43,43,43,0.08)' }, ticks:{color:'#555'} }
-      }
-    }
-  },
-  doughnut: {
-    type:'doughnut',
-    data:{
-      labels:['Enterprise','Mid-Market','SMB','Self-Serve'],
-      datasets:[{
-        data:[42,28,18,12],
-        backgroundColor:['rgba(115,115,115,0.9)','rgba(94,94,94,0.75)','rgba(115,115,115,0.45)','rgba(94,94,94,0.25)'],
-        borderColor:'rgba(43,43,43,0.12)',
-        borderWidth:2, hoverOffset:8,
-      }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{ position:'right', labels:{ color:'#888', boxWidth:12, padding:16 } }
+function getChartData(type) {
+  const c = getChartColors();
+  if (type === 'line') {
+    return {
+      type: 'line',
+      data: {
+        labels: labels7,
+        datasets: [{
+          label:'Revenue ($k)',
+          data:[312,480,396,542,498,620,754],
+          borderColor: c.color,
+          backgroundColor: c.fade,
+          tension:0.45, fill:true, pointBackgroundColor: c.color,
+          pointRadius:4, pointHoverRadius:7,
+        }]
       },
-      cutout:'68%',
-    }
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{ color:'rgba(43,43,43,0.08)' }, ticks:{color:'#555'} },
+          y:{ grid:{ color:'rgba(43,43,43,0.08)' }, ticks:{color:'#555'} }
+        }
+      }
+    };
+  } else if (type === 'bar') {
+    return {
+      type:'bar',
+      data:{
+        labels:labels7,
+        datasets:[{
+          label:'Active Users',
+          data:[9200,11400,10800,12600,11900,8400,14200],
+          backgroundColor: c.fade,
+          borderColor: c.color,
+          borderWidth:2,
+          borderRadius:6,
+          hoverBackgroundColor: c.glow,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{display:false}, ticks:{color:'#666'} },
+          y:{ grid:{ color:'rgba(43,43,43,0.08)' }, ticks:{color:'#555'} }
+        }
+      }
+    };
+  } else {
+    return {
+      type:'doughnut',
+      data:{
+        labels:['Enterprise','Mid-Market','SMB','Self-Serve'],
+        datasets:[{
+          data:[42,28,18,12],
+          backgroundColor:[c.color, c.dim, c.glow, 'rgba(120,120,120,0.2)'],
+          borderColor:'rgba(43,43,43,0.12)',
+          borderWidth:2, hoverOffset:8,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{ position:'right', labels:{ color:'#888', boxWidth:12, padding:16 } }
+        },
+        cutout:'68%',
+      }
+    };
   }
-};
+}
 
 let currentChart = null;
+let currentChartType = 'line';
 function renderChart(type) {
   if (currentChart) currentChart.destroy();
-  const cfg = chartData[type];
+  currentChartType = type || currentChartType;
+  const cfg = getChartData(currentChartType);
   currentChart = new Chart(document.getElementById('mainChart'), {
     type: cfg.type, data: cfg.data, options: cfg.options
   });
@@ -2475,6 +2948,10 @@ document.querySelectorAll('#chartTabs button').forEach(btn => {
     this.classList.add('active');
     renderChart(this.dataset.chart);
   });
+});
+
+window.addEventListener('themeColorChange', () => {
+  renderChart(currentChartType);
 });
 
 /* ════════════════════════════════════════════
@@ -2552,13 +3029,18 @@ if (pipeLine) {
   pipeLine.style.strokeDasharray  = totalLen;
   pipeLine.style.strokeDashoffset = totalLen;
 
+  let pipelineScrollFrame = null;
   window.addEventListener('scroll', () => {
-    const rect = pipelineSec.getBoundingClientRect();
-    const progress = Math.max(0, Math.min(1,
-      (window.innerHeight - rect.top) / (window.innerHeight + rect.height)
-    ));
-    pipeLine.style.strokeDashoffset = totalLen * (1 - Math.min(progress * 2.5, 1));
-  });
+    if (pipelineScrollFrame !== null) return;
+    pipelineScrollFrame = requestAnimationFrame(() => {
+      pipelineScrollFrame = null;
+      const rect = pipelineSec.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1,
+        (window.innerHeight - rect.top) / (window.innerHeight + rect.height)
+      ));
+      pipeLine.style.strokeDashoffset = totalLen * (1 - Math.min(progress * 2.5, 1));
+    });
+  }, { passive: true });
 }
 
 /* ════════════════════════════════════════════
@@ -2716,7 +3198,9 @@ if (heroVisual && heroCanvas) {
 
       const hub = new THREE.Mesh(new THREE.CircleGeometry(0.035, 16), materials.coral);
       hub.position.z = 0.012;
+      hub.userData.componentLabel = 'Node Status & Telemetry Light';
       fan.add(hub);
+      fan.userData.componentLabel = 'Node Status & Telemetry Light';
 
       for (let bladeIndex = 0; bladeIndex < 4; bladeIndex++) {
         const blade = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.11, 0.012), materials.edge);
@@ -2729,19 +3213,30 @@ if (heroVisual && heroCanvas) {
       return fan;
     }
 
-    addBox(rack, 0.12, 2.55, 1.35, materials.frame, -1.04, 0, 0);
-    addBox(rack, 0.12, 2.55, 1.35, materials.frame, 1.04, 0, 0);
-    addBox(rack, 2.18, 0.12, 1.35, materials.frame, 0, 1.28, 0);
-    addBox(rack, 2.18, 0.12, 1.35, materials.frame, 0, -1.28, 0);
-    addBox(rack, 2.42, 0.12, 1.62, materials.panel, 0, -1.39, 0);
-    addBox(rack, 0.14, 0.28, 0.14, materials.frame, -0.92, -1.57, 0.58);
-    addBox(rack, 0.14, 0.28, 0.14, materials.frame, 0.92, -1.57, 0.58);
+    const enclosureParts = [
+      addBox(rack, 0.12, 2.55, 1.35, materials.frame, -1.04, 0, 0),
+      addBox(rack, 0.12, 2.55, 1.35, materials.frame, 1.04, 0, 0),
+      addBox(rack, 2.18, 0.12, 1.35, materials.frame, 0, 1.28, 0),
+      addBox(rack, 2.18, 0.12, 1.35, materials.frame, 0, -1.28, 0),
+      addBox(rack, 2.42, 0.12, 1.62, materials.panel, 0, -1.39, 0)
+    ];
+    enclosureParts.forEach(part => {
+      part.userData.componentLabel = 'Server Rack Enclosure';
+    });
+    const rackMounts = [
+      addBox(rack, 0.14, 0.28, 0.14, materials.frame, -0.92, -1.57, 0.58),
+      addBox(rack, 0.14, 0.28, 0.14, materials.frame, 0.92, -1.57, 0.58)
+    ];
+    rackMounts.forEach(mount => {
+      mount.userData.componentLabel = 'Rack Mount Bracket';
+    });
 
     const fans = [];
     for (let unitIndex = 0; unitIndex < 3; unitIndex++) {
       const unitY = 0.76 - unitIndex * 0.76;
       const unit = new THREE.Group();
       unit.position.y = unitY;
+      unit.userData.componentLabel = 'Compute Node (Blade 1-3)';
 
       const shell = addBox(unit, 1.86, 0.62, 1.28, materials.chassis, 0, 0, 0);
       const edges = new THREE.LineSegments(
@@ -2759,12 +3254,14 @@ if (heroVisual && heroCanvas) {
         addBox(unit, 0.055, 0.23, 0.018, materials.dark, -0.13 + ventIndex * 0.065, 0, 0.691);
       }
 
-      addBox(unit, 0.04, 0.04, 0.025, materials.coral, 0.78, 0.12, 0.69);
+      const statusIndicator = addBox(unit, 0.04, 0.04, 0.025, materials.coral, 0.78, 0.12, 0.69);
+      statusIndicator.userData.componentLabel = 'Node Status & Telemetry Light';
       addBox(unit, 0.04, 0.04, 0.025, materials.edge, 0.78, 0.02, 0.69);
       rack.add(unit);
     }
 
     const accelerator = new THREE.Group();
+    accelerator.userData.componentLabel = 'External MCU / Interface Bridge';
     accelerator.position.set(1.2, -0.58, 0.82);
     accelerator.rotation.set(0.12, -0.18, 0.2);
     accelerator.scale.setScalar(0.82);
@@ -2817,9 +3314,215 @@ if (heroVisual && heroCanvas) {
     const packetMaterial = new THREE.MeshBasicMaterial({ color: 0x737373 });
     for (let packetIndex = 0; packetIndex < 3; packetIndex++) {
       const packet = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.075, 0.075), packetMaterial);
+      packet.userData.componentLabel = 'High-Speed Interconnect Cable';
       rack.add(packet);
       packets.push({ mesh: packet, offset: packetIndex / 3 });
     }
+
+    dataCable.userData.componentLabel = 'High-Speed Interconnect Cable';
+
+    rack.traverse(object => {
+      if (!object.isMesh) return;
+      let component = object;
+      while (component && component !== rack.parent && !component.userData.componentLabel) {
+        component = component.parent;
+      }
+      if (component && component.userData.componentLabel) {
+        object.userData.label = component.userData.componentLabel;
+      }
+    });
+
+    const partRaycaster = new THREE.Raycaster();
+    const partPointer = new THREE.Vector2();
+    const partTooltip = document.getElementById('heroPartTooltip');
+    const connectorPath = document.getElementById('heroPartConnectorPath');
+    const connectorDot = document.getElementById('heroPartConnectorDot');
+    let activePartLabel = null;
+    let activePartPoint = null;
+    let latestPointerPosition = null;
+    let raycastFrameId = null;
+    const partDetails = {
+      'Server Rack Enclosure': {
+        category: 'Cluster Infrastructure',
+        title: 'Server Rack Enclosure',
+        status: 'STRUCTURAL',
+        description: 'The protective frame that holds and aligns the compute blades, keeping the cluster hardware organized and supported.',
+        specLabel: 'ROLE',
+        specValue: 'Hardware Housing'
+      },
+      'Compute Node (Blade 1-3)': {
+        category: 'Processing Tier',
+        title: 'Compute Node (Blade 1-3)',
+        status: 'ACTIVE',
+        description: 'Three server blades share processing work across the cluster. Each node handles data workloads and reports its health through the front-panel indicators.',
+        specLabel: 'NODES',
+        specValue: '3 Compute Blades'
+      },
+      'Node Status & Telemetry Light': {
+        category: 'Node Telemetry',
+        title: 'Status & Telemetry Indicator',
+        status: 'LIVE',
+        description: 'The front-panel lights represent node health and activity, making it easy to identify which compute units are running or reporting status.',
+        specLabel: 'SIGNAL',
+        specValue: 'Health & Activity'
+      },
+      'External MCU / Interface Bridge': {
+        category: 'Edge Interface',
+        title: 'External MCU / Interface Bridge',
+        status: 'CONNECTED',
+        description: 'The side-mounted controller represents an interface bridge between the server cluster and attached edge devices or external data systems.',
+        specLabel: 'ROLE',
+        specValue: 'Device Integration'
+      },
+      'High-Speed Interconnect Cable': {
+        category: 'Data Interconnect',
+        title: 'High-Speed Interconnect Cable',
+        status: 'LINK ACTIVE',
+        description: 'This cable illustrates the high-speed data path connecting the rack to the external interface board for data exchange.',
+        specLabel: 'LINK',
+        specValue: 'Cluster to Edge Board'
+      },
+      'Rack Mount Bracket': {
+        category: 'Mounting Hardware',
+        title: 'Rack Mount Bracket',
+        status: 'SECURED',
+        description: 'The lower mounting tabs support the enclosure and represent the hardware used to secure server equipment in a rack.',
+        specLabel: 'ROLE',
+        specValue: 'Rack Support'
+      }
+    };
+    const partCategory = document.getElementById('heroPartCategory');
+    const partStatus = document.getElementById('heroPartStatus');
+    const partTitle = document.getElementById('heroPartTitle');
+    const partDescription = document.getElementById('heroPartDescription');
+    const partSpecLabel = document.getElementById('heroPartSpecLabel');
+    const partSpecValue = document.getElementById('heroPartSpecValue');
+    const partClose = document.getElementById('heroPartClose');
+    let pinnedPart = false;
+
+    function updatePartConnector(worldPoint) {
+      if (!worldPoint || !heroVisual.classList.contains('has-part-details')) return;
+      const visualBounds = heroVisual.getBoundingClientRect();
+      const canvasBounds = heroCanvas.getBoundingClientRect();
+      const projected = worldPoint.clone().project(camera);
+      const pointX = canvasBounds.left - visualBounds.left + ((projected.x + 1) / 2) * canvasBounds.width;
+      const pointY = canvasBounds.top - visualBounds.top + ((1 - projected.y) / 2) * canvasBounds.height;
+      const cardBounds = partTooltip.getBoundingClientRect();
+      const startX = cardBounds.right - visualBounds.left;
+      const startY = Math.max(
+        cardBounds.top - visualBounds.top + 18,
+        Math.min(pointY, cardBounds.bottom - visualBounds.top - 18)
+      );
+      const horizontalGap = Math.max(0, pointX - startX);
+      const firstControlX = startX + horizontalGap * 0.45;
+      const secondControlX = pointX - horizontalGap * 0.35;
+
+      connectorPath.setAttribute(
+        'd',
+        `M ${startX} ${startY} C ${firstControlX} ${startY}, ${secondControlX} ${pointY}, ${pointX} ${pointY}`
+      );
+      connectorDot.setAttribute('cx', pointX);
+      connectorDot.setAttribute('cy', pointY);
+    }
+
+    function hidePartTooltip() {
+      const needsResize = heroVisual.classList.contains('has-part-details');
+      partTooltip.style.display = 'none';
+      partTooltip.setAttribute('aria-hidden', 'true');
+      partTooltip.classList.remove('is-pinned');
+      heroVisual.classList.remove('has-part-details');
+      activePartLabel = null;
+      activePartPoint = null;
+      connectorPath.setAttribute('d', '');
+      pinnedPart = false;
+      if (raycastFrameId !== null) {
+        cancelAnimationFrame(raycastFrameId);
+        raycastFrameId = null;
+      }
+      if (needsResize) requestAnimationFrame(resizeHeroScene);
+    }
+
+    function updatePartTooltip(event) {
+      const canvasBounds = heroCanvas.getBoundingClientRect();
+      if (!canvasBounds.width || !canvasBounds.height) return null;
+      partPointer.x = ((event.clientX - canvasBounds.left) / canvasBounds.width) * 2 - 1;
+      partPointer.y = -((event.clientY - canvasBounds.top) / canvasBounds.height) * 2 + 1;
+      partRaycaster.setFromCamera(partPointer, camera);
+
+      const hit = partRaycaster.intersectObject(rack, true).find(intersection =>
+        intersection.object.userData.label
+      );
+      if (!hit) return null;
+
+      const details = partDetails[hit.object.userData.label];
+      if (!details) return null;
+      pinnedPart = true;
+      const isNewPart = activePartLabel !== hit.object.userData.label;
+      if (isNewPart) {
+        activePartLabel = hit.object.userData.label;
+        partCategory.textContent = details.category;
+        partStatus.textContent = details.status;
+        partTitle.textContent = details.title;
+        partDescription.textContent = details.description;
+        partSpecLabel.textContent = details.specLabel;
+        partSpecValue.textContent = details.specValue;
+      }
+      const wasExpanded = heroVisual.classList.contains('has-part-details');
+      heroVisual.classList.add('has-part-details');
+      partTooltip.classList.toggle('is-pinned', pinnedPart);
+      partTooltip.style.display = 'block';
+      partTooltip.setAttribute('aria-hidden', 'false');
+      if (isNewPart || !activePartPoint) {
+        activePartPoint = hit.point.clone();
+      }
+      updatePartConnector(activePartPoint);
+      if (!wasExpanded) {
+        targetRotationX = rack.rotation.x;
+        targetRotationY = rack.rotation.y;
+        requestAnimationFrame(resizeHeroScene);
+      }
+      return hit;
+    }
+
+    function pointerIsOverPartCard(event) {
+      if (partTooltip.style.display === 'none') return false;
+      const bounds = partTooltip.getBoundingClientRect();
+      return event.clientX >= bounds.left && event.clientX <= bounds.right &&
+        event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+    }
+
+    heroVisual.addEventListener('pointermove', event => {
+      if (event.target instanceof Element && event.target.closest('.hero-part-tooltip')) return;
+      if (pointerIsOverPartCard(event)) return;
+      if (window.matchMedia('(pointer: fine)').matches) {
+        latestPointerPosition = { clientX: event.clientX, clientY: event.clientY };
+        if (raycastFrameId === null) {
+          raycastFrameId = requestAnimationFrame(() => {
+            raycastFrameId = null;
+            if (latestPointerPosition) updatePartTooltip(latestPointerPosition);
+          });
+        }
+      }
+    });
+
+    heroVisual.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch') return;
+      if (event.target instanceof Element && event.target.closest('.hero-part-tooltip')) return;
+      if (pointerIsOverPartCard(event) && activePartPoint) {
+        pinnedPart = true;
+        partTooltip.classList.add('is-pinned');
+        return;
+      }
+      const hit = updatePartTooltip(event);
+      if (hit) {
+        pinnedPart = true;
+        partTooltip.classList.add('is-pinned');
+        updatePartConnector(activePartPoint);
+      }
+    });
+
+    partTooltip.addEventListener('pointerdown', event => event.stopPropagation());
+    partClose.addEventListener('click', hidePartTooltip);
 
     const floorGrid = new THREE.GridHelper(8, 28, 0x737373, 0x77736d);
     floorGrid.position.y = -1.48;
@@ -2833,7 +3536,7 @@ if (heroVisual && heroCanvas) {
     const pointerQuery = window.matchMedia('(pointer: fine)');
 
     heroCanvas.addEventListener('pointermove', event => {
-      if (!pointerQuery.matches) return;
+      if (!pointerQuery.matches || heroVisual.classList.contains('has-part-details')) return;
       const bounds = heroCanvas.getBoundingClientRect();
       const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
       const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
@@ -2841,22 +3544,24 @@ if (heroVisual && heroCanvas) {
       targetRotationX = -0.035 + vertical * 0.08;
     });
 
-    heroCanvas.addEventListener('pointerleave', () => {
+    heroVisual.addEventListener('pointerleave', () => {
       targetRotationX = -0.035;
       targetRotationY = -0.28;
     });
 
     function resizeHeroScene() {
-      const bounds = heroVisual.getBoundingClientRect();
+      const bounds = heroCanvas.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
       renderer.setSize(bounds.width, bounds.height, false);
       camera.aspect = bounds.width / bounds.height;
       camera.updateProjectionMatrix();
       renderer.render(scene, camera);
+      if (activePartPoint) updatePartConnector(activePartPoint);
     }
 
     const sceneResizeObserver = new ResizeObserver(resizeHeroScene);
     sceneResizeObserver.observe(heroVisual);
+    sceneResizeObserver.observe(heroCanvas);
     window.addEventListener('resize', resizeHeroScene, { passive: true });
     resizeHeroScene();
     heroVisual.classList.add('is-rendered');
@@ -2864,11 +3569,25 @@ if (heroVisual && heroCanvas) {
 
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const clock = new THREE.Clock();
-      function animateHeroScene() {
-        requestAnimationFrame(animateHeroScene);
+      let heroAnimationFrame = null;
+      let heroInView = true;
+      let lastHeroFrameTime = performance.now();
+
+      function scheduleHeroAnimation() {
+        if (heroAnimationFrame === null && heroInView && !document.hidden) {
+          heroAnimationFrame = requestAnimationFrame(animateHeroScene);
+        }
+      }
+
+      function animateHeroScene(timestamp) {
+        heroAnimationFrame = null;
+        if (!heroInView || document.hidden) return;
+        const frameScale = Math.min((timestamp - lastHeroFrameTime) / (1000 / 60), 3);
+        lastHeroFrameTime = timestamp;
         const elapsed = clock.getElapsedTime();
-        rack.rotation.y += (targetRotationY - rack.rotation.y) * 0.035;
-        rack.rotation.x += (targetRotationX - rack.rotation.x) * 0.035;
+        const rotationEase = 1 - Math.pow(1 - 0.035, frameScale);
+        rack.rotation.y += (targetRotationY - rack.rotation.y) * rotationEase;
+        rack.rotation.x += (targetRotationX - rack.rotation.x) * rotationEase;
         fans.forEach((fan, fanIndex) => {
           fan.rotation.z = elapsed * (2.1 + (fanIndex % 3) * 0.25);
         });
@@ -2877,13 +3596,48 @@ if (heroVisual && heroCanvas) {
           packet.mesh.position.copy(dataPath.getPointAt(progress));
         });
         renderer.render(scene, camera);
+        scheduleHeroAnimation();
       }
-      animateHeroScene();
+
+      const heroVisibilityObserver = new IntersectionObserver(entries => {
+        heroInView = entries.some(entry => entry.isIntersecting);
+        if (heroInView) {
+          lastHeroFrameTime = performance.now();
+          scheduleHeroAnimation();
+        }
+      });
+      heroVisibilityObserver.observe(heroVisual);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          lastHeroFrameTime = performance.now();
+          scheduleHeroAnimation();
+        }
+      });
+      scheduleHeroAnimation();
     }
+    // Apply theme accent color to Three.js lighting & components
+    const savedThreeHex = localStorage.getItem('df-accent-color') || '#06b6d4';
+    const activeColor = new THREE.Color(savedThreeHex);
+    if (coralLight) coralLight.color.copy(activeColor);
+    if (rimLight) rimLight.color.copy(activeColor);
+    if (materials && materials.coral) materials.coral.color.copy(activeColor);
+
+    window.addEventListener('themeColorChange', event => {
+      if (event.detail && event.detail.hex) {
+        const nextCol = new THREE.Color(event.detail.hex);
+        if (coralLight) coralLight.color.copy(nextCol);
+        if (rimLight) rimLight.color.copy(nextCol);
+        if (materials && materials.coral) materials.coral.color.copy(nextCol);
+      }
+    });
   } catch (error) {
     console.warn('3D hero unavailable; showing static rack illustration.', error);
   }
 }
 </script>
+
+<!-- Sci-Fi Custom Cursor & Theme Studio Scripts -->
+<script src="cursor.js"></script>
+<script src="theme-changer.js"></script>
 </body>
 </html>

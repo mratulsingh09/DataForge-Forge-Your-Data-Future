@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Concept 04: Data Stream Trail — Dynamic Node Connector</title>
+
+  <!-- Google Fonts: Space Grotesk & Sora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <!-- Font Awesome 6 Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       SCENE & STYLE VARIABLES
+       Palette: Cyan #5fe3f5, near-black #0b0d10, dark surfaces, white text
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-space: #0b0d10;
+      --bg-surface: #12161d;
+      --bg-surface-elevated: #1a2029;
+      --bg-card: rgba(18, 22, 29, 0.88);
+      --border-card: rgba(95, 227, 245, 0.22);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+
+      --cyan: #5fe3f5;
+      --cyan-bright: #a2f4fd;
+      --cyan-dim: #2aa8b8;
+      --cyan-glow: rgba(95, 227, 245, 0.18);
+      --cyan-glow-med: rgba(95, 227, 245, 0.35);
+      --cyan-glow-strong: rgba(95, 227, 245, 0.65);
+      --grid-cyan: rgba(95, 227, 245, 0.09);
+
+      --text-white: #ffffff;
+      --text-muted: #8c97a8;
+      --text-dim: #5a6474;
+
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Sora', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-space);
+      color: var(--text-white);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CANVAS & RENDERING LAYERS
+       ═══════════════════════════════════════════════════════════════ */
+    #experience-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-space);
+    }
+
+    /* Faint perspective isometric grid floor in dim cyan */
+    .perspective-grid-floor {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background-image:
+        linear-gradient(var(--grid-cyan) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-cyan) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at 50% 55%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 65%, transparent 85%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 55%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 65%, transparent 85%);
+      opacity: 0.85;
+    }
+
+    /* Ambient background radial glow behind the rack */
+    .scene-ambient-glow {
+      position: absolute;
+      top: 52%;
+      left: 52%;
+      width: 850px;
+      height: 650px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle at center, rgba(95, 227, 245, 0.08) 0%, rgba(95, 227, 245, 0.02) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(40px);
+    }
+
+    /* Three.js 3D WebGL Canvas */
+    #webgl-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      display: block;
+      outline: none;
+      cursor: crosshair;
+    }
+
+    /* 2D Particle Trail & Vector Line Canvas Layer */
+    #stream-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* SVG Vector Connection Layer */
+    #vector-connector-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TYPOGRAPHY & BRANDING
+       ═══════════════════════════════════════════════════════════════ */
+    .branding-top-header {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .brand-eyebrow {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      text-shadow: 0 0 16px var(--cyan-glow-med);
+      margin-bottom: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-eyebrow::before,
+    .brand-eyebrow::after {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: var(--cyan);
+      opacity: 0.5;
+    }
+
+    .brand-main-title {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 3.2vw, 38px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      line-height: 1.1;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Concept 04 Title on the Left */
+    .concept-title-card {
+      position: absolute;
+      left: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      pointer-events: none;
+      max-width: 320px;
+    }
+
+    .concept-tag {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .concept-heading {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
+    }
+
+    .concept-heading span {
+      display: block;
+      color: var(--cyan);
+      text-shadow: 0 0 25px var(--cyan-glow-strong);
+    }
+
+    .concept-sub-desc {
+      margin-top: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       INTERACTIVE UI CHIPS (Hotspots)
+       ═══════════════════════════════════════════════════════════════ */
+    .ui-chip-hotspot {
+      position: absolute;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 18px;
+      background: rgba(18, 22, 29, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: var(--text-white);
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.4);
+      transition: all 0.28s var(--ease-snappy);
+    }
+
+    .ui-chip-hotspot:hover,
+    .ui-chip-hotspot:focus-visible,
+    .ui-chip-hotspot.is-active {
+      background: rgba(22, 30, 42, 0.95);
+      border-color: var(--cyan);
+      color: var(--cyan-bright);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 22px var(--cyan-glow-med);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .ui-chip-hotspot:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+
+    /* Top Left Chip: DF / COMPUTE CLUSTER */
+    #chip-cluster {
+      top: 130px;
+      left: 70px;
+    }
+
+    #chip-cluster i {
+      color: var(--cyan);
+      font-size: 13px;
+      filter: drop-shadow(0 0 8px var(--cyan));
+    }
+
+    /* Bottom Right Chip: ● LIVE 300+ DATA SOURCES */
+    #chip-sources {
+      bottom: 60px;
+      right: 80px;
+    }
+
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      animation: livePulseGlow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes livePulseGlow {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.95;
+        box-shadow: 0 0 6px var(--cyan);
+      }
+      50% {
+        transform: scale(1.35);
+        opacity: 0.4;
+        box-shadow: 0 0 16px var(--cyan);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       KEYBOARD & ACCESSIBLE 3D HOTSPOT ANCHORS
+       ═══════════════════════════════════════════════════════════════ */
+    .hotspot-accessibility-anchor {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid var(--cyan);
+      background: rgba(11, 13, 16, 0.85);
+      z-index: 18;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--cyan);
+      font-size: 10px;
+      opacity: 0;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(0.6);
+      transition: opacity 0.25s ease, transform 0.25s var(--ease-snappy), box-shadow 0.25s ease;
+      outline: none;
+    }
+
+    .hotspot-accessibility-anchor::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* Visible on hover or keyboard focus */
+    .hotspot-accessibility-anchor:focus-visible,
+    body.show-hotspots .hotspot-accessibility-anchor,
+    .hotspot-accessibility-anchor.is-highlighted {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      box-shadow: 0 0 20px var(--cyan-glow-strong);
+    }
+
+    .hotspot-accessibility-anchor:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 3px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DYNAMIC NODE CONNECTOR (Cursor Follower & Vector Line)
+       ═══════════════════════════════════════════════════════════════ */
+    #cursor-follower-node {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 14px;
+      height: 14px;
+      margin-top: -7px;
+      margin-left: -7px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 12px var(--cyan-bright), 0 0 24px var(--cyan);
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0;
+      transform: translate3d(-100px, -100px, 0);
+      transition: opacity 0.2s ease, transform 0.05s linear;
+    }
+
+    .node-microring {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1.5px solid var(--cyan);
+      opacity: 0.7;
+      animation: microringPulse 1.6s infinite ease-in-out;
+    }
+
+    @keyframes microringPulse {
+      0%, 100% {
+        transform: scale(0.95);
+        opacity: 0.75;
+      }
+      50% {
+        transform: scale(1.4);
+        opacity: 0.15;
+      }
+    }
+
+    /* Snapping target marker on hovered part */
+    #snap-target-marker {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      margin-top: -9px;
+      margin-left: -9px;
+      border-radius: 50%;
+      border: 1.5px dashed var(--cyan);
+      background: rgba(95, 227, 245, 0.15);
+      box-shadow: 0 0 16px var(--cyan-glow-strong);
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.2s ease, transform 0.25s var(--ease-snappy);
+    }
+
+    #snap-target-marker.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       INTERACTIVE TOOLTIP CARD
+       ═══════════════════════════════════════════════════════════════ */
+    #hotspot-tooltip-card {
+      position: fixed;
+      z-index: 150;
+      width: 310px;
+      max-width: calc(100vw - 32px);
+      padding: 18px 20px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px var(--cyan-glow);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate3d(0, 8px, 0);
+      transition: opacity 0.22s ease, transform 0.22s var(--ease-snappy), visibility 0.22s;
+    }
+
+    #hotspot-tooltip-card.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .tooltip-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .tooltip-category {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--cyan);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tooltip-category::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
+    }
+
+    .tooltip-status-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan-bright);
+      background: rgba(95, 227, 245, 0.12);
+      border: 1px solid rgba(95, 227, 245, 0.25);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .tooltip-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .tooltip-description {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    .tooltip-meta-specs {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+
+    .tooltip-meta-specs span b {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BOTTOM CONTROLS & HUD
+       ═════════════════════════════════════════════════ */
+    .hud-controls-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 14px;
+      background: rgba(18, 22, 29, 0.75);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+    }
+
+    .hud-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .hud-btn:hover,
+    .hud-btn:focus-visible,
+    .hud-btn.active {
+      color: #ffffff;
+      background: rgba(95, 227, 245, 0.14);
+      border-color: var(--cyan);
+    }
+
+    .hud-btn.active {
+      color: var(--cyan);
+    }
+
+    .hud-btn i {
+      font-size: 12px;
+    }
+
+    /* Back Link to Landing Page */
+    .back-home-link {
+      position: absolute;
+      top: 36px;
+      left: 48px;
+      z-index: 25;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background: rgba(18, 22, 29, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .back-home-link:hover,
+    .back-home-link:focus-visible {
+      color: var(--cyan);
+      border-color: var(--cyan);
+      background: rgba(22, 30, 42, 0.85);
+      transform: translateX(-2px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE ADAPTATIONS
+       ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 992px) {
+      .concept-title-card {
+        top: 110px;
+        left: 24px;
+        transform: none;
+        max-width: 260px;
+      }
+      .back-home-link {
+        top: 20px;
+        left: 20px;
+      }
+      #chip-cluster {
+        top: 210px;
+        left: 24px;
+      }
+      #chip-sources {
+        bottom: 74px;
+        right: 24px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .branding-top-header {
+        top: 18px;
+      }
+      .brand-eyebrow {
+        font-size: 10px;
+        letter-spacing: 2px;
+      }
+      .brand-main-title {
+        font-size: 18px;
+      }
+      .concept-title-card {
+        top: 84px;
+        left: 16px;
+        max-width: 200px;
+      }
+      .concept-heading {
+        font-size: 22px;
+      }
+      .concept-sub-desc {
+        display: none;
+      }
+      #chip-cluster {
+        top: auto;
+        bottom: 80px;
+        left: 16px;
+        padding: 6px 12px;
+        font-size: 10px;
+      }
+      #chip-sources {
+        bottom: 24px;
+        right: 16px;
+        padding: 6px 12px;
+        font-size: 10px;
+      }
+      .hud-controls-bar {
+        display: none;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       REDUCED MOTION PREFERENCE
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      #cursor-follower-node,
+      #vector-connector-svg {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="experience-container">
+  <!-- Back to Main Site Navigation -->
+  <a href="index.html" class="back-home-link" title="Return to DataForge Homepage">
+    <i class="fa-solid fa-arrow-left"></i> Main Site
+  </a>
+
+  <!-- Top Title Branding -->
+  <header class="branding-top-header">
+    <div class="brand-eyebrow">Interactive 3D Visual</div>
+    <h1 class="brand-main-title">Dynamic Node Connector</h1>
+  </header>
+
+  <!-- Left Concept Description -->
+  <div class="concept-title-card">
+    <div class="concept-tag">Hardware Architecture</div>
+    <h2 class="concept-heading">Concept 04: <span>Data Stream Trail</span></h2>
+    <p class="concept-sub-desc">
+      Explore the server cluster node in interactive 3D space. Hover or tab over any hardware component to trace data routing pathways and inspect node specifications.
+    </p>
+  </div>
+
+  <!-- Perspective Grid Floor & Ambient Glow -->
+  <div class="perspective-grid-floor" aria-hidden="true"></div>
+  <div class="scene-ambient-glow" aria-hidden="true"></div>
+
+  <!-- Three.js WebGL Canvas for Server Rack 3D Model -->
+  <canvas id="webgl-canvas" aria-label="Interactive 3D Server Rack Model. Use mouse to rotate, hover parts to inspect."></canvas>
+
+  <!-- 2D Particle Trail Canvas (Data stream of 0s & 1s flowing left) -->
+  <canvas id="stream-canvas" aria-hidden="true"></canvas>
+
+  <!-- SVG Vector Connector Line Overlay (Dynamic snapping laser link) -->
+  <svg id="vector-connector-svg" aria-hidden="true">
+    <defs>
+      <!-- Glowing Vector Line Gradient -->
+      <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="60%" stop-color="#5fe3f5"/>
+        <stop offset="100%" stop-color="rgba(95, 227, 245, 0.4)"/>
+      </linearGradient>
+
+      <!-- Glow Filter -->
+      <filter id="vectorGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Main dynamic snapping line -->
+    <line id="laser-line-glow" x1="0" y1="0" x2="0" y2="0" stroke="#5fe3f5" stroke-width="3" opacity="0" filter="url(#vectorGlow)" stroke-linecap="round"/>
+    <line id="laser-line-core" x1="0" y1="0" x2="0" y2="0" stroke="url(#laserGrad)" stroke-width="1.2" opacity="0" stroke-linecap="round" stroke-dasharray="6 3"/>
+  </svg>
+
+  <!-- Floating Cursor Dot & Ring (Dynamic Node Connector) -->
+  <div id="cursor-follower-node" aria-hidden="true">
+    <div class="node-microring"></div>
+  </div>
+
+  <!-- Target Snap Marker on Part -->
+  <div id="snap-target-marker" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════════════════
+       UI CHIP HOTSPOTS
+       ══════════════════════════════════════════════════ -->
+  <button id="chip-cluster" class="ui-chip-hotspot" tabindex="0" data-hotspot="chip-cluster" aria-label="DF / Compute Cluster Telemetry Hotspot">
+    <i class="fa-solid fa-network-wired" aria-hidden="true"></i>
+    <span>DF / Compute Cluster</span>
+  </button>
+
+  <button id="chip-sources" class="ui-chip-hotspot" tabindex="0" data-hotspot="chip-sources" aria-label="Live Ingestion Sources Hotspot">
+    <span class="live-pulse-dot" aria-hidden="true"></span>
+    <span>Live &nbsp; 300+ Data Sources</span>
+  </button>
+
+  <!-- ══════════════════════════════════════════════════
+       ACCESSIBLE KEYBOARD HOTSPOTS OVERLAY
+       ══════════════════════════════════════════════════ -->
+  <div id="accessible-anchors-container">
+    <button class="hotspot-accessibility-anchor" data-hotspot="rack" tabindex="0" aria-label="Chassis Rack Frame"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="drawer-1" tabindex="0" aria-label="Compute Node Drawer 01"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="drawer-2" tabindex="0" aria-label="Compute Node Drawer 02"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="drawer-3" tabindex="0" aria-label="Compute Node Drawer 03"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="fans" tabindex="0" aria-label="Cooling Fan Array"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="cable" tabindex="0" aria-label="High-Speed Fiber Data Loop Cable"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="clips" tabindex="0" aria-label="Connector Bus Clips"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="board" tabindex="0" aria-label="Ingest Circuit Board Accelerator"></button>
+    <button class="hotspot-accessibility-anchor" data-hotspot="datastream" tabindex="0" aria-label="Data Stream Trail"></button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       INTERACTIVE TOOLTIP CARD
+       ══════════════════════════════════════════════════ -->
+  <div id="hotspot-tooltip-card" role="tooltip" aria-hidden="true">
+    <div class="tooltip-header">
+      <span class="tooltip-category" id="tooltip-category">Hardware Component</span>
+      <span class="tooltip-status-pill" id="tooltip-status">ONLINE</span>
+    </div>
+    <h3 class="tooltip-title" id="tooltip-title">Compute Node</h3>
+    <p class="tooltip-description" id="tooltip-description">
+      Processes incoming data streams, executes distributed ML transformations, and coordinates cluster workloads.
+    </p>
+    <div class="tooltip-meta-specs">
+      <span>LATENCY: <b>&lt; 0.4ms</b></span>
+      <span>STATUS: <b>NOMINAL</b></span>
+    </div>
+  </div>
+
+  <!-- Bottom HUD Toolbar -->
+  <div class="hud-controls-bar">
+    <button type="button" class="hud-btn" id="btn-toggle-hotspots" title="Toggle visible hotspot target pins">
+      <i class="fa-solid fa-bullseye"></i> Show Pins
+    </button>
+    <button type="button" class="hud-btn" id="btn-reset-cam" title="Reset camera view">
+      <i class="fa-solid fa-arrows-rotate"></i> Reset View
+    </button>
+    <button type="button" class="hud-btn" id="btn-toggle-stream" title="Toggle particle data flow rate">
+      <i class="fa-solid fa-bolt"></i> <span id="stream-rate-label">Stream Boost: Off</span>
+    </button>
+  </div>
+</div>
+
+<!-- Three.js (Module) & OrbitControls -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ═══════════════════════════════════════════════════════════════
+   1. EDITABLE PART DESCRIPTIONS OBJECT
+   (All part names, titles, descriptions, categories, and specs)
+   ═══════════════════════════════════════════════════════════════ */
+export const PART_DESCRIPTIONS = {
+  'rack': {
+    title: 'Enterprise Server Chassis',
+    category: 'Structural Enclosure',
+    status: 'OPTIMAL',
+    description: 'High-density industrial rack engineered for cluster computing, thermal isolation, and heavy-duty EMI shielding.',
+    specs: { key: 'THERMAL', val: '42U Industrial Steel' },
+    soundPitch: 180
+  },
+  'drawer-1': {
+    title: 'Compute Node Drawer 01',
+    category: 'Active Processor Tier',
+    status: 'HIGH LOAD',
+    description: 'Primary computational blade. Executes streaming analytical jobs, Kafka ingestion partitions, and in-memory indexing.',
+    specs: { key: 'THROUGHPUT', val: '2.4 GB/s Live' },
+    soundPitch: 240
+  },
+  'drawer-2': {
+    title: 'Compute Node Drawer 02',
+    category: 'Active Processor Tier',
+    status: 'ACTIVE',
+    description: 'Secondary computational blade. Dedicated to distributed neural network inference and automated anomaly detection.',
+    specs: { key: 'WORKLOAD', val: '99.98% SLA' },
+    soundPitch: 260
+  },
+  'drawer-3': {
+    title: 'Compute Node Drawer 03',
+    category: 'Active Processor Tier',
+    status: 'STANDBY READY',
+    description: 'Redundant failover compute blade. Handles auto-scaling spikes and zero-downtime cluster rolling updates.',
+    specs: { key: 'AVAILABILITY', val: 'N+1 Redundant' },
+    soundPitch: 280
+  },
+  'fans': {
+    title: 'High-Static Pressure Cooling Fans',
+    category: 'Thermal Regulation',
+    status: '2,800 RPM',
+    description: 'Active cooling array. Dynamically balances airflow through internal vapor chambers to sustain safe operating temperatures.',
+    specs: { key: 'TEMP', val: '38.4°C Nominal' },
+    soundPitch: 340
+  },
+  'cable': {
+    title: 'Fiber-Optic Data Link Loop',
+    category: 'High-Speed Interconnect',
+    status: 'PULSING',
+    description: 'Ultra-low latency data link between cluster nodes. Pulsing glow brightness correlates with real-time network throughput.',
+    specs: { key: 'BANDWIDTH', val: '400 Gbps QSFP' },
+    soundPitch: 420
+  },
+  'clips': {
+    title: 'Connector Bus Clips',
+    category: 'Cable Management',
+    status: 'LOCKED',
+    description: 'Precision grounding clamps that secure the arched optical loop and prevent electromagnetic interference.',
+    specs: { key: 'SHIELDING', val: 'Gold-Plated EMI' },
+    soundPitch: 380
+  },
+  'board': {
+    title: 'Ingest Circuit Board Accelerator',
+    category: 'FPGA / I/O Bridge',
+    status: 'ACTIVE LINK',
+    description: 'Specialized ingest board that aggregates high-velocity telemetry from 300+ external endpoints into unified tensors.',
+    specs: { key: 'I/O SPEED', val: '< 0.35ms Latency' },
+    soundPitch: 480
+  },
+  'datastream': {
+    title: 'Data Stream Trail',
+    category: 'Telemetry Motion Stream',
+    status: 'STREAMING',
+    description: 'Outward flow of live binary packets leaving the cluster. Hover to accelerate streaming velocity and packet density.',
+    specs: { key: 'RATE', val: '1.2M Events/sec' },
+    soundPitch: 520
+  },
+  'chip-cluster': {
+    title: 'DF / Compute Cluster Telemetry',
+    category: 'System HUD Monitor',
+    status: 'NODE SYNCHRONIZED',
+    description: 'Cluster health telemetry chip. Continuously pings all 3 server drawers, verify thread allocation and heartbeat status.',
+    specs: { key: 'NODES', val: '3 Blade Servers' },
+    soundPitch: 310
+  },
+  'chip-sources': {
+    title: '300+ Live Data Sources',
+    category: 'Global Integration',
+    status: '312 CONNECTED',
+    description: 'Real-time multi-cloud connector status. Streams metrics from PostgreSQL, Kafka, Snowflake, S3, APIs, and microservices.',
+    specs: { key: 'SOURCES', val: '300+ Connected' },
+    soundPitch: 360
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   2. THREE.JS 3D SCENE SETUP (Server Rack Model)
+   ═══════════════════════════════════════════════════════════════ */
+const container = document.getElementById('experience-container');
+const canvas = document.getElementById('webgl-canvas');
+const streamCanvas = document.getElementById('stream-canvas');
+const streamCtx = streamCanvas.getContext('2d');
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 100);
+
+// Isometric angled perspective matching reference image
+camera.position.set(5.2, 4.4, 7.6);
+camera.lookAt(0, 0.2, 0);
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  alpha: true,
+  powerPreference: 'high-performance'
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.35;
+
+// OrbitControls (Smooth mouse rotation & zoom)
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 4;
+controls.maxDistance = 14;
+controls.maxPolarAngle = Math.PI / 2 + 0.05; // Don't go below floor
+controls.target.set(0, 0.2, 0);
+
+// Lighting setup
+const ambientLight = new THREE.HemisphereLight(0xffffff, 0x0b0d10, 1.4);
+scene.add(ambientLight);
+
+const mainDirectional = new THREE.DirectionalLight(0xffffff, 2.2);
+mainDirectional.position.set(-4, 6, 5);
+scene.add(mainDirectional);
+
+const cyanFill = new THREE.DirectionalLight(0x5fe3f5, 1.8);
+cyanFill.position.set(4, 2, 2);
+scene.add(cyanFill);
+
+const rackRimLight = new THREE.DirectionalLight(0x5fe3f5, 2.5);
+rackRimLight.position.set(0, 3, -5);
+scene.add(rackRimLight);
+
+// Interactive 3D Object Group
+const worldGroup = new THREE.Group();
+scene.add(worldGroup);
+
+// Materials dictionary
+const materials = {
+  frameOuter: new THREE.MeshStandardMaterial({
+    color: 0x1b232c,
+    metalness: 0.82,
+    roughness: 0.25
+  }),
+  frameInner: new THREE.MeshStandardMaterial({
+    color: 0x10151c,
+    metalness: 0.75,
+    roughness: 0.4
+  }),
+  drawerShell: new THREE.MeshStandardMaterial({
+    color: 0x242e39,
+    metalness: 0.65,
+    roughness: 0.32
+  }),
+  fanHousing: new THREE.MeshStandardMaterial({
+    color: 0x181f28,
+    metalness: 0.8,
+    roughness: 0.28
+  }),
+  fanBlade: new THREE.MeshStandardMaterial({
+    color: 0x2a3542,
+    metalness: 0.6,
+    roughness: 0.35
+  }),
+  cyanLed: new THREE.MeshBasicMaterial({
+    color: 0x5fe3f5
+  }),
+  cable: new THREE.MeshStandardMaterial({
+    color: 0x5fe3f5,
+    emissive: 0x5fe3f5,
+    emissiveIntensity: 0.85,
+    roughness: 0.2,
+    metalness: 0.1
+  }),
+  clip: new THREE.MeshStandardMaterial({
+    color: 0x5a6575,
+    metalness: 0.9,
+    roughness: 0.2
+  }),
+  pcbBoard: new THREE.MeshStandardMaterial({
+    color: 0x0f151c,
+    metalness: 0.3,
+    roughness: 0.45
+  }),
+  pcbChip: new THREE.MeshStandardMaterial({
+    color: 0x222a36,
+    metalness: 0.7,
+    roughness: 0.3
+  }),
+  pcbHeatsink: new THREE.MeshStandardMaterial({
+    color: 0x5fe3f5,
+    emissive: 0x2aa8b8,
+    emissiveIntensity: 0.35,
+    metalness: 0.85,
+    roughness: 0.2
+  })
+};
+
+// Hotspot lookup registry for raycasting & anchor projection
+const interactiveHotspotMeshes = [];
+const anchorPositions = {}; // 3D world vectors for each hotspot
+
+function registerHotspotMesh(mesh, partKey, worldAnchorVector) {
+  mesh.userData = { partKey };
+  interactiveHotspotMeshes.push(mesh);
+  if (worldAnchorVector) {
+    anchorPositions[partKey] = worldAnchorVector;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3. GEOMETRY BUILDER (Exact Server Rack Architecture)
+   ═══════════════════════════════════════════════════════════════ */
+const rackGroup = new THREE.Group();
+worldGroup.add(rackGroup);
+
+// A. Main Server Rack Cabinet Frame
+const cabinetWidth = 2.0;
+const cabinetHeight = 2.65;
+const cabinetDepth = 1.35;
+
+const cabinetGeom = new THREE.BoxGeometry(cabinetWidth, cabinetHeight, cabinetDepth);
+const cabinetMesh = new THREE.Mesh(cabinetGeom, materials.frameOuter);
+cabinetMesh.position.y = cabinetHeight / 2;
+rackGroup.add(cabinetMesh);
+
+// Cutout inner bay
+const innerBayGeom = new THREE.BoxGeometry(cabinetWidth - 0.22, cabinetHeight - 0.26, cabinetDepth - 0.12);
+const innerBayMesh = new THREE.Mesh(innerBayGeom, materials.frameInner);
+innerBayMesh.position.set(0, cabinetHeight / 2, 0.08);
+rackGroup.add(innerBayMesh);
+
+// Base plinth & feet
+const plinth = new THREE.Mesh(new THREE.BoxGeometry(cabinetWidth + 0.22, 0.14, cabinetDepth + 0.22), materials.frameOuter);
+plinth.position.y = 0.07;
+rackGroup.add(plinth);
+
+// 4 Corner foot pegs
+for (let fx of [-0.9, 0.9]) {
+  for (let fz of [-0.55, 0.55]) {
+    const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.14, 12), materials.clip);
+    foot.position.set(fx, 0, fz);
+    rackGroup.add(foot);
+  }
+}
+
+// Wireframe edges on the cabinet frame for sci-fi look
+const frameEdges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(cabinetGeom),
+  new THREE.LineBasicMaterial({ color: 0x5fe3f5, transparent: true, opacity: 0.35 })
+);
+cabinetMesh.add(frameEdges);
+
+registerHotspotMesh(cabinetMesh, 'rack', new THREE.Vector3(1.1, 2.2, 0.7));
+
+// B. Three Stacked Drawers (Compute Nodes)
+const drawerWidth = 1.74;
+const drawerHeight = 0.68;
+const drawerDepth = 1.25;
+const drawerGap = 0.76;
+const drawerStartY = 0.58;
+
+const rotatingFanBlades = [];
+
+for (let d = 0; d < 3; d++) {
+  const drawerY = drawerStartY + d * drawerGap;
+  const drawerGroup = new THREE.Group();
+  drawerGroup.position.set(0, drawerY, 0.08);
+
+  // Drawer Face & Body
+  const drawerMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(drawerWidth, drawerHeight, drawerDepth),
+    materials.drawerShell
+  );
+  drawerGroup.add(drawerMesh);
+
+  // Subtle outer edge glow line
+  const drawerEdges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(drawerMesh.geometry),
+    new THREE.LineBasicMaterial({ color: 0x5fe3f5, transparent: true, opacity: 0.4 })
+  );
+  drawerMesh.add(drawerEdges);
+
+  // Front bezel plate
+  const bezel = new THREE.Mesh(
+    new THREE.BoxGeometry(drawerWidth - 0.04, drawerHeight - 0.06, 0.04),
+    materials.frameInner
+  );
+  bezel.position.z = drawerDepth / 2 + 0.015;
+  drawerGroup.add(bezel);
+
+  // 3 Cooling Fans on each drawer face
+  const fanSpacing = 0.52;
+  const fanZ = drawerDepth / 2 + 0.038;
+
+  for (let f = 0; f < 3; f++) {
+    const fanX = (f - 1) * fanSpacing;
+    const fanGroup = new THREE.Group();
+    fanGroup.position.set(fanX, 0, fanZ);
+
+    // Fan Outer Torus Ring Housing
+    const ringMesh = new THREE.Mesh(
+      new THREE.TorusGeometry(0.165, 0.018, 12, 28),
+      materials.fanHousing
+    );
+    fanGroup.add(ringMesh);
+
+    // Fan Inner Hub
+    const hubMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.045, 0.045, 0.03, 16),
+      materials.fanHousing
+    );
+    hubMesh.rotation.x = Math.PI / 2;
+    fanGroup.add(hubMesh);
+
+    // Blades container (rotating)
+    const bladeGroup = new THREE.Group();
+    for (let b = 0; b < 4; b++) {
+      const blade = new THREE.Mesh(
+        new THREE.BoxGeometry(0.024, 0.13, 0.008),
+        materials.fanBlade
+      );
+      blade.position.y = 0.075;
+      blade.rotation.z = (b * Math.PI) / 2 + 0.35;
+      bladeGroup.add(blade);
+    }
+    fanGroup.add(bladeGroup);
+    rotatingFanBlades.push(bladeGroup);
+
+    // Cyan LED Status Indicator
+    const led = new THREE.Mesh(
+      new THREE.CircleGeometry(0.022, 12),
+      materials.cyanLed
+    );
+    led.position.set(0, 0, 0.018);
+    fanGroup.add(led);
+
+    drawerGroup.add(fanGroup);
+    registerHotspotMesh(ringMesh, 'fans', new THREE.Vector3(fanX, drawerY, fanZ + 0.2));
+  }
+
+  // Small status LED on drawer right edge
+  const drawerLed = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.02), materials.cyanLed);
+  drawerLed.position.set(drawerWidth / 2 - 0.12, 0.18, drawerDepth / 2 + 0.03);
+  drawerGroup.add(drawerLed);
+
+  rackGroup.add(drawerGroup);
+
+  const drawerKey = `drawer-${d + 1}`;
+  registerHotspotMesh(drawerMesh, drawerKey, new THREE.Vector3(0, drawerY, drawerDepth / 2 + 0.1));
+}
+
+// C. Glowing Cyan Cable Looping Over Rack
+const cableCurvePoints = [
+  new THREE.Vector3(-1.45, 0.72, 0.65), // Left down
+  new THREE.Vector3(-1.42, 1.75, 0.70), // Left rising
+  new THREE.Vector3(-0.85, 2.68, 0.65), // Top-left curve
+  new THREE.Vector3(0.0, 2.82, 0.62),   // Over top center
+  new THREE.Vector3(0.85, 2.55, 0.68),  // Top-right curve
+  new THREE.Vector3(1.28, 1.55, 0.75),  // Right descending
+  new THREE.Vector3(1.18, 0.45, 0.88),  // Towards circuit board
+  new THREE.Vector3(0.92, 0.32, 0.95)   // Into ingest board connector
+];
+
+const cablePath = new THREE.CatmullRomCurve3(cableCurvePoints);
+const cableGeometry = new THREE.TubeGeometry(cablePath, 90, 0.024, 8, false);
+const cableMesh = new THREE.Mesh(cableGeometry, materials.cable);
+rackGroup.add(cableMesh);
+
+registerHotspotMesh(cableMesh, 'cable', new THREE.Vector3(0, 2.85, 0.7));
+
+// D. Connector Clips along the cable
+const clipTValues = [0.28, 0.52, 0.76];
+clipTValues.forEach((t, idx) => {
+  const pt = cablePath.getPointAt(t);
+  const clipMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.09, 0.09, 0.09),
+    materials.clip
+  );
+  clipMesh.position.copy(pt);
+
+  // Point clip along tangent
+  const tangent = cablePath.getTangentAt(t);
+  clipMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+
+  rackGroup.add(clipMesh);
+  registerHotspotMesh(clipMesh, 'clips', pt.clone());
+});
+
+// E. Circuit Board Accelerator (Ingest Board at bottom right)
+const boardGroup = new THREE.Group();
+boardGroup.position.set(0.95, 0.28, 0.88);
+boardGroup.rotation.set(0.12, -0.22, 0.05);
+
+// Main substrate PCB
+const pcb = new THREE.Mesh(
+  new THREE.BoxGeometry(0.95, 0.06, 0.68),
+  materials.pcbBoard
+);
+boardGroup.add(pcb);
+
+// Wireframe edges on board
+const pcbEdges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(pcb.geometry),
+  new THREE.LineBasicMaterial({ color: 0x5fe3f5, transparent: true, opacity: 0.6 })
+);
+pcb.add(pcbEdges);
+
+// Main FPGA / ASIC Processor Heatsink (glowing cyan / metal)
+const heatsink = new THREE.Mesh(
+  new THREE.BoxGeometry(0.28, 0.09, 0.28),
+  materials.pcbHeatsink
+);
+heatsink.position.set(-0.16, 0.07, 0.02);
+boardGroup.add(heatsink);
+
+// Cable Terminal Connector Block
+const cableTerminal = new THREE.Mesh(
+  new THREE.BoxGeometry(0.12, 0.09, 0.14),
+  materials.clip
+);
+cableTerminal.position.set(-0.02, 0.075, 0.07);
+boardGroup.add(cableTerminal);
+
+// Memory chips array (HBM stacks)
+for (let m = 0; m < 4; m++) {
+  const chip = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, 0.04, 0.12),
+    materials.pcbChip
+  );
+  chip.position.set(0.18 + (m % 2) * 0.12, 0.045, -0.16 + Math.floor(m / 2) * 0.2);
+  boardGroup.add(chip);
+}
+
+// Glowing cyan accent bus trace
+const busTrace = new THREE.Mesh(
+  new THREE.BoxGeometry(0.42, 0.015, 0.035),
+  materials.cyanLed
+);
+busTrace.position.set(0.12, 0.035, 0.22);
+boardGroup.add(busTrace);
+
+rackGroup.add(boardGroup);
+registerHotspotMesh(pcb, 'board', new THREE.Vector3(0.95, 0.45, 0.88));
+
+// F. Data Stream Trail Anchor (Left base of rack)
+anchorPositions['datastream'] = new THREE.Vector3(-1.8, 0.35, 0.85);
+
+/* ═══════════════════════════════════════════════════════════════
+   4. DATA STREAM PARTICLE SYSTEM (Canvas 2D Flowing Left)
+   Continuous stream of tiny glowing 0 and 1 particles with soft fading trail
+   ═══════════════════════════════════════════════════════════════ */
+class DataStreamSystem {
+  constructor() {
+    this.particles = [];
+    this.maxParticles = 140;
+    this.speedMultiplier = 1.0;
+    this.spawnRate = 2; // particles per frame
+  }
+
+  resize() {
+    streamCanvas.width = window.innerWidth * (window.devicePixelRatio || 1);
+    streamCanvas.height = window.innerHeight * (window.devicePixelRatio || 1);
+    streamCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+  }
+
+  // Project 3D rack base origin to 2D screen coordinates
+  getOriginScreenPos() {
+    const origin3D = new THREE.Vector3(-0.95, 0.25, 0.45);
+    const screen = origin3D.clone().project(camera);
+    return {
+      x: ((screen.x + 1) / 2) * window.innerWidth,
+      y: ((-screen.y + 1) / 2) * window.innerHeight
+    };
+  }
+
+  spawn(origin) {
+    const count = Math.round(this.spawnRate * this.speedMultiplier);
+    for (let i = 0; i < count; i++) {
+      if (this.particles.length >= this.maxParticles) {
+        this.particles.shift();
+      }
+
+      const isBinary = Math.random() < 0.38;
+      const char = Math.random() > 0.5 ? '1' : '0';
+
+      // Velocity flowing towards bottom-left with spread
+      const angle = Math.PI * 0.92 + (Math.random() - 0.5) * 0.45;
+      const speed = (Math.random() * 2.2 + 1.2) * this.speedMultiplier;
+
+      this.particles.push({
+        x: origin.x + (Math.random() - 0.5) * 20,
+        y: origin.y + (Math.random() - 0.5) * 16,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed * 0.45,
+        size: isBinary ? Math.floor(Math.random() * 4 + 9) : Math.random() * 2.5 + 1.2,
+        isBinary,
+        char,
+        alpha: 1.0,
+        decay: Math.random() * 0.016 + 0.012,
+        glow: Math.random() > 0.4
+      });
+    }
+  }
+
+  updateAndDraw() {
+    streamCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    const origin = this.getOriginScreenPos();
+    this.spawn(origin);
+
+    // Draw flowing terminal arrow pointing left in direction of stream
+    const arrowX = origin.x - 220;
+    const arrowY = origin.y + 40;
+    this.drawMotionArrow(arrowX, arrowY);
+
+    // Update & render each particle
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= p.decay;
+
+      if (p.alpha <= 0) {
+        this.particles.splice(i, 1);
+        continue;
+      }
+
+      if (p.isBinary) {
+        // Draw 0 and 1 glowing characters
+        streamCtx.save();
+        streamCtx.font = `600 ${p.size}px "JetBrains Mono", monospace`;
+        streamCtx.textAlign = 'center';
+        streamCtx.textBaseline = 'middle';
+        streamCtx.fillStyle = `rgba(95, 227, 245, ${p.alpha * 0.9})`;
+        if (p.glow) {
+          streamCtx.shadowColor = 'rgba(95, 227, 245, 0.9)';
+          streamCtx.shadowBlur = 8;
+        }
+        streamCtx.fillText(p.char, p.x, p.y);
+        streamCtx.restore();
+      } else {
+        // Draw tiny glowing dots
+        streamCtx.save();
+        streamCtx.beginPath();
+        streamCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        streamCtx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.95})`;
+        streamCtx.shadowColor = 'rgba(95, 227, 245, 0.85)';
+        streamCtx.shadowBlur = 6;
+        streamCtx.fill();
+
+        // Soft outer halo
+        streamCtx.beginPath();
+        streamCtx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+        streamCtx.fillStyle = `rgba(95, 227, 245, ${p.alpha * 0.25})`;
+        streamCtx.fill();
+        streamCtx.restore();
+      }
+    }
+  }
+
+  drawMotionArrow(x, y) {
+    streamCtx.save();
+    streamCtx.translate(x, y);
+    streamCtx.rotate(Math.PI * 0.96);
+
+    // Glowing arrowhead
+    streamCtx.beginPath();
+    streamCtx.moveTo(14, 0);
+    streamCtx.lineTo(-8, -8);
+    streamCtx.lineTo(-4, 0);
+    streamCtx.lineTo(-8, 8);
+    streamCtx.closePath();
+
+    streamCtx.fillStyle = '#ffffff';
+    streamCtx.shadowColor = '#5fe3f5';
+    streamCtx.shadowBlur = 14;
+    streamCtx.fill();
+
+    streamCtx.strokeStyle = '#5fe3f5';
+    streamCtx.lineWidth = 1.5;
+    streamCtx.stroke();
+    streamCtx.restore();
+  }
+}
+
+const dataStream = new DataStreamSystem();
+dataStream.resize();
+window.addEventListener('resize', () => dataStream.resize());
+
+/* ═══════════════════════════════════════════════════════════════
+   5. DYNAMIC NODE CONNECTOR & TOOLTIP ENGINE
+   ═══════════════════════════════════════════════════════════════ */
+const cursorNode = document.getElementById('cursor-follower-node');
+const snapMarker = document.getElementById('snap-target-marker');
+const tooltipCard = document.getElementById('hotspot-tooltip-card');
+const tooltipCategory = document.getElementById('tooltip-category');
+const tooltipTitle = document.getElementById('tooltip-title');
+const tooltipDesc = document.getElementById('tooltip-description');
+const tooltipStatus = document.getElementById('tooltip-status');
+const laserLineGlow = document.getElementById('laser-line-glow');
+const laserLineCore = document.getElementById('laser-line-core');
+
+const mousePos = { x: window.innerWidth * 0.45, y: window.innerHeight * 0.4 };
+const cursorSmooth = { x: mousePos.x, y: mousePos.y };
+
+let activeHotspotKey = null;
+let currentSnappedScreenPos = null;
+
+// Raycaster for 3D mouse interaction
+const raycaster = new THREE.Raycaster();
+const normalizedMouse = new THREE.Vector2(-10, -10);
+
+window.addEventListener('pointermove', (e) => {
+  mousePos.x = e.clientX;
+  mousePos.y = e.clientY;
+
+  // Normalized coordinates for Raycaster
+  normalizedMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  normalizedMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  cursorNode.style.opacity = '1';
+});
+
+// Convert 3D world vector to 2D screen pixels
+function projectWorldToScreen(worldVec) {
+  const projected = worldVec.clone().project(camera);
+  return {
+    x: ((projected.x + 1) / 2) * window.innerWidth,
+    y: ((-projected.y + 1) / 2) * window.innerHeight
+  };
+}
+
+// Find nearest hotspot to cursor when not directly hovered
+function getNearestHotspotScreenPos() {
+  let nearestDist = Infinity;
+  let nearestPos = null;
+  let nearestKey = null;
+
+  for (const [key, worldVec] of Object.entries(anchorPositions)) {
+    const screen = projectWorldToScreen(worldVec);
+    const dist = Math.hypot(screen.x - mousePos.x, screen.y - mousePos.y);
+    if (dist < nearestDist) {
+      nearestDist = dist;
+      nearestPos = screen;
+      nearestKey = key;
+    }
+  }
+
+  // Also test UI chips
+  const chipCluster = document.getElementById('chip-cluster');
+  const chipSources = document.getElementById('chip-sources');
+  for (const chip of [chipCluster, chipSources]) {
+    if (!chip) continue;
+    const rect = chip.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dist = Math.hypot(cx - mousePos.x, cy - mousePos.y);
+    if (dist < nearestDist) {
+      nearestDist = dist;
+      nearestPos = { x: cx, y: cy };
+      nearestKey = chip.getAttribute('data-hotspot');
+    }
+  }
+
+  return { pos: nearestPos, key: nearestKey, dist: nearestDist };
+}
+
+// Show Tooltip Card with safe viewport boundaries
+function displayTooltip(key, screenX, screenY) {
+  const info = PART_DESCRIPTIONS[key];
+  if (!info) return;
+
+  tooltipCategory.textContent = info.category || 'Cluster Component';
+  tooltipTitle.textContent = info.title;
+  tooltipDesc.textContent = info.description;
+  tooltipStatus.textContent = info.status || 'ONLINE';
+
+  tooltipCard.classList.add('is-visible');
+
+  // Calculate safe viewport placement (avoid clipping on right & bottom edges)
+  const cardWidth = 320;
+  const cardHeight = 160;
+  const margin = 20;
+
+  let posX = screenX + 24;
+  let posY = screenY - 24;
+
+  if (posX + cardWidth > window.innerWidth - margin) {
+    posX = screenX - cardWidth - 24;
+  }
+  if (posY + cardHeight > window.innerHeight - margin) {
+    posY = window.innerHeight - cardHeight - margin;
+  }
+  if (posY < margin) {
+    posY = margin;
+  }
+
+  tooltipCard.style.left = `${posX}px`;
+  tooltipCard.style.top = `${posY}px`;
+}
+
+function hideTooltip() {
+  tooltipCard.classList.remove('is-visible');
+}
+
+// Set active hotspot
+function setActiveHotspot(key, screenTarget) {
+  if (activeHotspotKey === key) return;
+  activeHotspotKey = key;
+
+  if (key && PART_DESCRIPTIONS[key]) {
+    currentSnappedScreenPos = screenTarget;
+
+    // Display snap marker
+    snapMarker.style.left = `${screenTarget.x}px`;
+    snapMarker.style.top = `${screenTarget.y}px`;
+    snapMarker.classList.add('active');
+
+    displayTooltip(key, screenTarget.x, screenTarget.y);
+
+    // Boost particle flow speed if data stream is hovered
+    if (key === 'datastream') {
+      dataStream.speedMultiplier = 2.4;
+      dataStream.spawnRate = 4;
+    } else {
+      dataStream.speedMultiplier = 1.0;
+      dataStream.spawnRate = 2;
+    }
+  } else {
+    currentSnappedScreenPos = null;
+    snapMarker.classList.remove('active');
+    hideTooltip();
+    dataStream.speedMultiplier = 1.0;
+    dataStream.spawnRate = 2;
+  }
+}
+
+// Attach hover & keyboard focus to 2D UI chips
+document.querySelectorAll('.ui-chip-hotspot').forEach(chip => {
+  const key = chip.getAttribute('data-hotspot');
+
+  const onActivate = () => {
+    const rect = chip.getBoundingClientRect();
+    const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    chip.classList.add('is-active');
+    setActiveHotspot(key, center);
+  };
+
+  const onDeactivate = () => {
+    chip.classList.remove('is-active');
+    if (activeHotspotKey === key) {
+      setActiveHotspot(null, null);
+    }
+  };
+
+  chip.addEventListener('mouseenter', onActivate);
+  chip.addEventListener('mouseleave', onDeactivate);
+  chip.addEventListener('focus', onActivate);
+  chip.addEventListener('blur', onDeactivate);
+  chip.addEventListener('click', onActivate);
+});
+
+// Attach keyboard focus to 3D accessible anchors
+document.querySelectorAll('.hotspot-accessibility-anchor').forEach(anchor => {
+  const key = anchor.getAttribute('data-hotspot');
+
+  const onFocus = () => {
+    anchor.classList.add('is-highlighted');
+    const worldVec = anchorPositions[key];
+    const screen = worldVec ? projectWorldToScreen(worldVec) : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    setActiveHotspot(key, screen);
+  };
+
+  const onBlur = () => {
+    anchor.classList.remove('is-highlighted');
+    if (activeHotspotKey === key) {
+      setActiveHotspot(null, null);
+    }
+  };
+
+  anchor.addEventListener('focus', onFocus);
+  anchor.addEventListener('blur', onBlur);
+  anchor.addEventListener('mouseenter', onFocus);
+  anchor.addEventListener('mouseleave', onBlur);
+  anchor.addEventListener('click', onFocus);
+});
+
+// Update screen positions of accessible pins
+function updateAccessibilityPins() {
+  document.querySelectorAll('.hotspot-accessibility-anchor').forEach(anchor => {
+    const key = anchor.getAttribute('data-hotspot');
+    const worldVec = anchorPositions[key];
+    if (worldVec) {
+      const screen = projectWorldToScreen(worldVec);
+      anchor.style.left = `${screen.x}px`;
+      anchor.style.top = `${screen.y}px`;
+    }
+  });
+}
+
+// Raycasting to detect hover over 3D model meshes
+function check3DIntersection() {
+  raycaster.setFromCamera(normalizedMouse, camera);
+  const intersects = raycaster.intersectObjects(interactiveHotspotMeshes, false);
+
+  if (intersects.length > 0) {
+    const hit = intersects[0];
+    const key = hit.object.userData.partKey;
+    if (key) {
+      const screen = projectWorldToScreen(hit.point);
+      setActiveHotspot(key, screen);
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6. HUD CONTROLS
+   ═══════════════════════════════════════════════════════════════ */
+const btnPins = document.getElementById('btn-toggle-hotspots');
+btnPins.addEventListener('click', () => {
+  document.body.classList.toggle('show-hotspots');
+  btnPins.classList.toggle('active');
+});
+
+const btnResetCam = document.getElementById('btn-reset-cam');
+btnResetCam.addEventListener('click', () => {
+  camera.position.set(5.2, 4.4, 7.6);
+  controls.target.set(0, 0.2, 0);
+  controls.update();
+});
+
+const btnToggleStream = document.getElementById('btn-toggle-stream');
+const streamLabel = document.getElementById('stream-rate-label');
+let isBoosted = false;
+btnToggleStream.addEventListener('click', () => {
+  isBoosted = !isBoosted;
+  btnToggleStream.classList.toggle('active', isBoosted);
+  dataStream.speedMultiplier = isBoosted ? 2.5 : 1.0;
+  streamLabel.textContent = isBoosted ? 'Stream Boost: Active' : 'Stream Boost: Off';
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   7. MAIN RENDER LOOP (60 FPS)
+   ═══════════════════════════════════════════════════════════════ */
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const delta = clock.getDelta();
+  const elapsed = clock.getElapsedTime();
+
+  // Smooth cursor follower interpolation (lerp)
+  cursorSmooth.x += (mousePos.x - cursorSmooth.x) * 0.35;
+  cursorSmooth.y += (mousePos.y - cursorSmooth.y) * 0.35;
+  cursorNode.style.transform = `translate3d(${cursorSmooth.x}px, ${cursorSmooth.y}px, 0)`;
+
+  // Rotate cooling fan blades
+  rotatingFanBlades.forEach((blades, idx) => {
+    blades.rotation.z += (3.5 + (idx % 3) * 0.4) * delta;
+  });
+
+  // Slow pulsing glow on the arched cyan cable
+  const cablePulse = 0.75 + Math.sin(elapsed * 2.2) * 0.35;
+  materials.cable.emissiveIntensity = cablePulse;
+
+  // Orbit controls update
+  controls.update();
+
+  // Raycast hover check if not hovering a 2D DOM chip
+  const isHoveringChip = document.querySelector('.ui-chip-hotspot:hover');
+  if (!isHoveringChip) {
+    const has3DHit = check3DIntersection();
+    if (!has3DHit && activeHotspotKey && !activeHotspotKey.startsWith('chip')) {
+      setActiveHotspot(null, null);
+    }
+  }
+
+  // Render 3D Scene
+  renderer.render(scene, camera);
+
+  // Render 2D Data Stream Particles
+  dataStream.updateAndDraw();
+
+  // Update dynamic snapping vector line from cursor to nearest part
+  const nearest = getNearestHotspotScreenPos();
+  const targetPos = currentSnappedScreenPos || (nearest.dist < 260 ? nearest.pos : null);
+
+  if (targetPos) {
+    laserLineGlow.setAttribute('x1', cursorSmooth.x);
+    laserLineGlow.setAttribute('y1', cursorSmooth.y);
+    laserLineGlow.setAttribute('x2', targetPos.x);
+    laserLineGlow.setAttribute('y2', targetPos.y);
+    laserLineGlow.setAttribute('opacity', activeHotspotKey ? '0.85' : '0.35');
+
+    laserLineCore.setAttribute('x1', cursorSmooth.x);
+    laserLineCore.setAttribute('y1', cursorSmooth.y);
+    laserLineCore.setAttribute('x2', targetPos.x);
+    laserLineCore.setAttribute('y2', targetPos.y);
+    laserLineCore.setAttribute('opacity', activeHotspotKey ? '1' : '0.45');
+  } else {
+    laserLineGlow.setAttribute('opacity', '0');
+    laserLineCore.setAttribute('opacity', '0');
+  }
+
+  // Update pin positions if visible
+  if (document.body.classList.contains('show-hotspots')) {
+    updateAccessibilityPins();
+  }
+}
+
+// Window resize handler
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  dataStream.resize();
+}, { passive: true });
+
+// Start animation loop
+animate();
+</script>
+
+</body>
+</html>
+
